@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aditya Sengupta — Product Manager</title>
+  <meta name="description" content="Aditya Shankar Sengupta: product manager and RPA consultant at Flipkart. Internal products, process automation and employee experience at scale." />
+  <meta name="theme-color" content="#FAFAF9" />
+
+  <!-- Theme before first paint, so dark-mode visitors never see a white flash -->
+  <script>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            canvas: 'rgb(var(--canvas) / <alpha-value>)',
+            surface: 'rgb(var(--surface) / <alpha-value>)',
+            ink: 'rgb(var(--ink) / <alpha-value>)',
+            muted: 'rgb(var(--muted) / <alpha-value>)',
+            line: 'rgb(var(--line) / <alpha-value>)',
+            accent: 'rgb(var(--accent) / <alpha-value>)',
+            'accent-soft': 'rgb(var(--accent-soft) / <alpha-value>)',
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* ---------- Design tokens ---------- */
+    :root {
+      --canvas: 250 250 249;      /* #FAFAF9 linen */
+      --surface: 255 255 255;
+      --ink: 17 17 17;            /* #111111 charcoal */
+      --muted: 103 103 112;
+      --line: 228 228 231;        /* #E4E4E7 stone */
+      --accent: 77 124 15;        /* #4D7C0F muted sage */
+      --accent-soft: 239 244 230;
+      color-scheme: light;
+    }
+    .dark {
+      --canvas: 15 15 14;
+      --surface: 23 23 22;
+      --ink: 242 242 240;
+      --muted: 160 160 168;
+      --line: 42 42 45;
+      --accent: 163 196 104;
+      --accent-soft: 32 40 22;
+      color-scheme: dark;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body {
+      background: rgb(var(--canvas));
+      color: rgb(var(--ink));
+      font-feature-settings: 'ss01', 'cv11';
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    ::selection { background: rgb(var(--accent) / .22); }
+    :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 3px; border-radius: 6px; }
+
+    /* Hero name: the one loud moment on the page */
+    .display {
+      font-size: clamp(3.25rem, 11vw, 9.5rem);
+      line-height: .88;
+      letter-spacing: -0.055em;
+      font-weight: 600;
+    }
+    .display .thin { font-weight: 300; color: rgb(var(--muted)); }
+
+    /* Page-load sequence (hero only) */
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .reveal { animation: rise .9s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
+
+    /* Collapsible role cards: animates to auto height */
+    .expander { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.2,.7,.2,1); }
+    .expander > div { overflow: hidden; min-height: 0; }
+    [data-open="true"] .expander { grid-template-rows: 1fr; }
+    .chev { transition: transform .3s ease; }
+    [data-open="true"] .chev { transform: rotate(180deg); }
+
+    /* Skills filter dimming */
+    .skill { transition: opacity .25s ease, background-color .25s ease, color .25s ease, border-color .25s ease; }
+    .skill[data-dim="true"] { opacity: .28; }
+    .skill[data-hit="true"] { background: rgb(var(--accent-soft)); border-color: rgb(var(--accent) / .45); color: rgb(var(--accent)); }
+
+    /* Project dialog */
+    dialog::backdrop { background: rgb(17 17 17 / .45); backdrop-filter: blur(4px); }
+    dialog[open] { animation: pop .28s cubic-bezier(.2,.7,.2,1); }
+    @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+
+    .nav-link[aria-current="true"] { color: rgb(var(--ink)); }
+    .nav-link[aria-current="true"]::after { transform: scaleX(1); }
+    .nav-link::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 1.5px;
+      background: rgb(var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform .3s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    #print-resume { display: none; }
+
+    /* ---------- Print: a dedicated one-page, black-and-white resume ---------- */
+    @media print {
+      @page { size: A4; margin: 11mm 13mm; }
+      html, body { background: #fff !important; color: #000 !important; }
+      body > *:not(#print-resume) { display: none !important; }
+      #print-resume { display: block !important; font-size: 8.8pt; line-height: 1.38; color: #000; }
+      #print-resume * { color: #000 !important; }
+      #print-resume h1 { font-size: 19pt; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+      #print-resume .p-sub { font-size: 10pt; margin-top: 1pt; }
+      #print-resume .p-contact { margin-top: 3pt; font-size: 8.4pt; }
+      #print-resume h2 { font-size: 9.4pt; font-weight: 700; margin: 9pt 0 3pt; padding-bottom: 2pt; border-bottom: .6pt solid #000; }
+      #print-resume .p-role { display: flex; justify-content: space-between; font-weight: 700; margin-top: 4pt; }
+      #print-resume .p-role span { font-weight: 400; }
+      #print-resume ul { margin: 2pt 0 0 12pt; padding: 0; list-style: disc; }
+      #print-resume li { margin: 0 0 1.4pt; }
+      #print-resume .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18pt; }
+      #print-resume .p-row { margin: 1.2pt 0; }
+      #print-resume b { font-weight: 600; }
+      a { text-decoration: none !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen font-sans antialiased transition-colors duration-300">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-canvas">Skip to content</a>
+
+  <!-- ===================== Header ===================== -->
+  <header id="site-header" class="sticky top-0 z-50 border-b border-transparent bg-canvas/80 backdrop-blur-xl transition-colors duration-300">
+    <div class="mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
+      <a href="#top" class="flex items-center gap-2.5" aria-label="Aditya Sengupta, back to top">
+        <span class="grid h-8 w-8 place-items-center rounded-full bg-ink text-[11px] font-semibold tracking-tight text-canvas">AS</span>
+        <span class="hidden text-sm font-semibold tracking-tight md:inline">Aditya Sengupta</span>
+      </a>
+
+      <nav aria-label="Sections" class="flex items-center gap-3.5 text-[13px] sm:gap-7 sm:text-sm">
+        <a href="#about" class="nav-link relative text-muted transition-colors hover:text-ink">About</a>
+        <a href="#experience" class="nav-link relative text-muted transition-colors hover:text-ink">Experience</a>
+        <a href="#projects" class="nav-link relative text-muted transition-colors hover:text-ink">Projects</a>
+        <a href="#skills" class="nav-link relative text-muted transition-colors hover:text-ink">Skills</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="Aditya-Sengupta-Resume.pdf" download class="hidden items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-ink/40 lg:inline-flex">
+          <i data-lucide="download" class="h-4 w-4"></i> Resume PDF
+        </a>
+        <button id="theme-toggle" type="button" class="grid h-9 w-9 place-items-center rounded-full border border-line transition-colors hover:border-ink/40" aria-label="Switch to dark mode">
+          <i data-lucide="moon" class="h-4 w-4 dark:hidden"></i>
+          <i data-lucide="sun" class="hidden h-4 w-4 dark:block"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===================== Hero ===================== -->
+    <section id="top" class="mx-auto max-w-[1320px] px-4 pb-20 pt-14 sm:px-8 sm:pt-20 lg:px-12 lg:pb-28 lg:pt-24">
+      <h1 class="display reveal" style="--d:60ms">
+        Aditya<br /><span class="thin">Sengupta</span>
+      </h1>
+
+      <div class="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-12 lg:gap-10">
+        <div class="lg:col-span-7">
+          <p class="reveal max-w-[34ch] text-[1.45rem] font-normal leading-snug tracking-[-0.015em] sm:text-[1.9rem]" style="--d:220ms">
+            Product manager and RPA consultant at Flipkart. I build internal products that employees choose to use, then automate the work around them.
+          </p>
+
+          <div class="reveal mt-9 flex flex-wrap items-center gap-2.5" style="--d:360ms">
+            <a href="Aditya-Sengupta-Resume.pdf" download class="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-transform hover:-translate-y-px active:translate-y-0">
+              <i data-lucide="download" class="h-4 w-4"></i> Download resume (PDF)
+            </a>
+            <div class="inline-flex items-center rounded-full border border-line bg-surface">
+              <a href="mailto:adityashankar.sengupta@gmail.com" class="inline-flex items-center gap-2 py-2.5 pl-4 pr-2 text-sm transition-colors hover:text-accent">
+                <i data-lucide="mail" class="h-4 w-4"></i> Email
+              </a>
+              <button type="button" data-copy="adityashankar.sengupta@gmail.com" class="mr-1 grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-canvas hover:text-ink" aria-label="Copy email address">
+                <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+              </button>
+            </div>
+            <a href="https://www.linkedin.com/in/adityasengupta0209" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
+              <i data-lucide="linkedin" class="h-4 w-4"></i> LinkedIn
+            </a>
+            <a href="tel:+919702005351" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
+              <i data-lucide="phone" class="h-4 w-4"></i> +91 97020 05351
+            </a>
+          </div>
+        </div>
+
+        <aside class="reveal lg:col-span-4 lg:col-start-9" style="--d:480ms" aria-label="At a glance">
+          <dl class="divide-y divide-line border-y border-line text-[15px]">
+            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
+              <dt class="text-muted">Now</dt>
+              <dd>Leading 4 internal products across Flipkart and Myntra</dd>
+            </div>
+            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
+              <dt class="text-muted">Learning</dt>
+              <dd>Professional Certificate in Product Management, IIM Kozhikode</dd>
+            </div>
+            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
+              <dt class="text-muted">Based in</dt>
+              <dd class="flex items-center gap-1.5"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> Navi Mumbai, India</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== About ===================== -->
+    <section id="about" class="border-t border-line">
+      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
+        <h2 class="text-sm font-medium text-muted lg:col-span-3">About</h2>
+        <div class="lg:col-span-9">
+          <p class="max-w-[60ch] text-xl leading-relaxed tracking-[-0.01em] sm:text-2xl sm:leading-[1.55]">
+            For 4.5 years I've worked where product meets process: first as a business analyst at TCS delivering automation for global clients, and now at Flipkart, owning four internal products used across Flipkart and Myntra.
+          </p>
+          <p class="mt-6 max-w-[64ch] text-[17px] leading-[1.75] text-muted">
+            I translate complex business needs into products that scale, get cross-functional teams pulling in one direction, and ship in agile cycles. Alongside product work I've led 60+ automation deployments on UiPath and Automation Anywhere, saving thousands of operational hours for teams around the world.
+          </p>
+
+          <dl class="mt-14 grid grid-cols-2 border-t border-line md:grid-cols-4">
+            <div class="flex flex-col border-b border-line py-6 pr-4 md:border-b-0">
+              <dt class="order-2 mt-2 text-sm leading-snug text-muted">years across product and business analysis</dt>
+              <dd class="order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">4.5</dd>
+            </div>
+            <div class="flex flex-col border-b border-l border-line py-6 pl-4 md:border-b-0 md:pr-4">
+              <dt class="mt-2 text-sm leading-snug text-muted">automations shipped on UiPath and Automation Anywhere</dt>
+              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">60+</dd>
+            </div>
+            <div class="flex flex-col border-line py-6 pr-4 md:border-l md:pl-4">
+              <dt class="mt-2 text-sm leading-snug text-muted">hours saved a year at Flipkart through automation</dt>
+              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">15k+</dd>
+            </div>
+            <div class="flex flex-col border-l border-line py-6 pl-4">
+              <dt class="mt-2 text-sm leading-snug text-muted">of Myntra adopted Horizon 360 in three months</dt>
+              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] text-accent sm:text-5xl">90%+</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Experience ===================== -->
+    <section id="experience" class="border-t border-line">
+      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
+        <div class="lg:col-span-3">
+          <h2 class="text-sm font-medium text-muted">Experience</h2>
+          <p class="mt-3 max-w-[28ch] text-sm leading-relaxed text-muted">Open a role to see the products, programmes and results behind it.</p>
+          <button id="expand-all" type="button" class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline">Expand all roles</button>
+        </div>
+        <ol id="timeline" class="relative space-y-6 lg:col-span-9" aria-label="Work history, most recent first"></ol>
+      </div>
+    </section>
+
+    <!-- ===================== Projects ===================== -->
+    <section id="projects" class="border-t border-line">
+      <div class="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:px-12 lg:py-28">
+        <div class="grid gap-6 lg:grid-cols-12">
+          <h2 class="text-sm font-medium text-muted lg:col-span-3">Projects</h2>
+          <p class="max-w-[52ch] text-xl leading-relaxed tracking-[-0.01em] lg:col-span-9 sm:text-2xl">
+            Products launched, platforms revamped and automation programmes run. Select any one for the full story.
+          </p>
+        </div>
+        <div id="bento" class="mt-12 grid auto-rows-[minmax(220px,auto)] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6"></div>
+      </div>
+    </section>
+
+    <!-- ===================== Skills ===================== -->
+    <section id="skills" class="border-t border-line">
+      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
+        <div class="lg:col-span-3">
+          <h2 class="text-sm font-medium text-muted">Skills</h2>
+          <p id="skill-caption" class="mt-3 max-w-[30ch] text-sm leading-relaxed text-muted" aria-live="polite"></p>
+        </div>
+        <div class="lg:col-span-9">
+          <div id="skill-filters" role="toolbar" aria-label="Filter skills by domain" class="flex flex-wrap gap-2"></div>
+          <ul id="skill-cloud" class="mt-8 flex flex-wrap gap-2.5" aria-label="Skills and tools"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Education & recognition ===================== -->
+    <section id="education" class="border-t border-line">
+      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
+        <h2 class="text-sm font-medium text-muted lg:col-span-3">Education and recognition</h2>
+        <div class="grid gap-12 md:grid-cols-2 lg:col-span-9">
+          <div>
+            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="graduation-cap" class="h-4 w-4 text-accent"></i> Education</h3>
+            <ul class="mt-5 divide-y divide-line border-y border-line">
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">MBA, Analytics and Marketing</p><span class="text-sm tabular-nums text-muted">2021</span></div>
+                <p class="mt-1 text-sm text-muted">KIIT School of Management, KIIT Deemed to be University</p>
+              </li>
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">B.Tech, Electronics and Telecommunication</p><span class="text-sm tabular-nums text-muted">2019</span></div>
+                <p class="mt-1 text-sm text-muted">Kalinga Institute of Industrial Technology, KIIT Deemed to be University</p>
+              </li>
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Professional Certificate in Product Management</p><span class="text-sm text-accent">In progress</span></div>
+                <p class="mt-1 text-sm text-muted">IIM Kozhikode. Also certified online in Digital Marketing, Google Analytics and Excel.</p>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="award" class="h-4 w-4 text-accent"></i> Recognition</h3>
+            <ul class="mt-5 divide-y divide-line border-y border-line">
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Kool and the Gang Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">Automated inventory reconciliation, cutting manual workload by 97%.</p>
+              </li>
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">For launching Horizon 360 and Lounge.</p>
+              </li>
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Instant Karma Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">Managing RPA use cases for 15+ cross-functional processes.</p>
+              </li>
+              <li class="py-5">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">TCS, Sep 2021</span></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== Footer ===================== -->
+  <footer class="border-t border-line">
+    <div class="mx-auto flex max-w-[1320px] flex-col gap-8 px-4 py-16 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12">
+      <div>
+        <p class="text-muted">Open to product management roles.</p>
+        <a href="mailto:adityashankar.sengupta@gmail.com" class="mt-2 inline-block break-all text-2xl font-semibold tracking-[-0.03em] decoration-accent decoration-2 underline-offset-[6px] hover:underline sm:text-4xl">adityashankar.sengupta@gmail.com</a>
+      </div>
+      <div class="flex items-center gap-6 text-sm text-muted">
+        <a href="https://www.linkedin.com/in/adityasengupta0209" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 hover:text-ink">LinkedIn <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i></a>
+        <a href="#top" class="hover:text-ink">Back to top</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== Project dialog ===================== -->
+  <dialog id="project-dialog" aria-labelledby="dlg-title" class="m-auto w-[min(640px,calc(100vw-2rem))] max-h-[min(86vh,760px)] overflow-y-auto rounded-3xl border border-line bg-surface p-0 text-ink shadow-2xl">
+    <div class="sticky top-0 flex items-start justify-between gap-4 border-b border-line bg-surface/95 px-6 py-5 backdrop-blur sm:px-8">
+      <div>
+        <p id="dlg-org" class="text-sm text-muted"></p>
+        <h3 id="dlg-title" class="mt-1 text-2xl font-semibold tracking-[-0.03em]"></h3>
+      </div>
+      <button type="button" data-close class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line hover:border-ink/40" aria-label="Close">
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+    </div>
+    <div id="dlg-body" class="px-6 pb-8 pt-6 sm:px-8"></div>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 translate-y-4 rounded-full bg-ink px-4 py-2 text-sm text-canvas opacity-0 transition-all duration-300"></div>
+
+  <!-- ===================== Print-only resume (Cmd/Ctrl + P) ===================== -->
+  <article id="print-resume" aria-hidden="true"></article>
+
+  <script>
+    /* =========================================================
+       Content: single source for timeline, bento, skills, print
+       ========================================================= */
+    const EXPERIENCE = [
+      {
+        id: 'flipkart',
+        company: 'Flipkart',
+        legal: 'Flipkart Internet Pvt. Ltd.',
+        role: 'Product Manager and RPA Consultant',
+        period: 'Aug 2023 – Present',
+        current: true,
+        metrics: [
+          ['4', 'internal products owned'],
+          ['50+', 'RPA automations shipped'],
+          ['15,000+', 'hours saved a year'],
+          ['60%', 'faster process turnaround'],
+        ],
+        products: [
+          ['Horizon 360', 'Myntra', 'Designed, built and launched an org-wide employee feedback platform from scratch. 90%+ adoption in the first 3 months; presented the final rollout to Myntra’s CHRO.'],
+          ['Lounge', 'Myntra', 'Led end-to-end development of Myntra’s employee experience portal with 7 cross-functional teams. 70% adoption in the first 3 months after launch.'],
+          ['Reflect', 'Flipkart', 'Led the platform revamp as product manager: roadmap, release cycles, and 100% of P0 incidents resolved within SLA.'],
+          ['Femo', 'Flipkart', 'Conceptualised and delivered 7+ major enhancements, lifting platform engagement 20% quarter on quarter.'],
+        ],
+        groups: [
+          ['RPA consulting', [
+            'Delivered 50+ UiPath automations across HR, CX, Ekart, Jeeves/F1 and Finance.',
+            'Saved 15,000+ man-hours a year and cut process turnaround time by up to 60%.',
+          ]],
+          ['Key highlights', [
+            'Shipped Horizon 360 and Lounge on tight timelines with zero critical defects at go-live.',
+            'Set up tighter stakeholder feedback loops, shortening requirement sign-off cycles.',
+            'Recognised for resolving multiple high-priority incidents with minimal downtime.',
+          ]],
+        ],
+        competencies: ['Feature ideation', 'Requirements gathering', 'Documentation', 'Product roadmapping', 'Stakeholder management', 'Agile delivery'],
+      },
+      {
+        id: 'tcs',
+        company: 'Tata Consultancy Services',
+        legal: 'Tata Consultancy Services',
+        role: 'Business Analyst',
+        period: 'Jul 2021 – Aug 2023',
+        metrics: [
+          ['20+', 'RPA use cases delivered'],
+          ['100%', 'on-time delivery'],
+          ['40%', 'faster process execution'],
+          ['300+', 'global users supported'],
+        ],
+        groups: [
+          ['RPA delivery', [
+            'Delivered 20+ RPA use cases and 2 migration projects to Automation Anywhere, 100% on time and fully compliant with client requirements.',
+            'Owned business analysis end to end: requirements, BRDs and functional specs, pre-study and complexity analysis, process workflows.',
+            'Ran developer handoffs across cross-functional teams with zero rework during development.',
+            'Managed UAT planning, test case validation, walkthroughs and post-go-live hypercare for multiple business units.',
+          ]],
+          ['Master data management', [
+            'Managed 8 MDM interfaces with full support for 4 key integrations: data mapping, gap analysis and integration rules.',
+            'Supported 300+ global users through post-deployment issues, tracked in ServiceNow.',
+            'Facilitated workshops aligning business and technical stakeholders on data governance and automation strategy.',
+          ]],
+          ['Key highlights', [
+            'Reduced process execution time by 40% through automation optimisation.',
+            'Improved MDM data accuracy by 15% through better mapping and integration rules.',
+            'Delivered weekly status updates to IT leadership on a consistent cadence.',
+          ]],
+        ],
+        competencies: ['Business analysis', 'BRD and functional specs', 'UAT planning', 'Data mapping', 'Gap analysis', 'Hypercare', 'Waterfall delivery'],
+      },
+    ];
+
+    const PROJECTS = [
+      {
+        id: 'horizon', org: 'Myntra', period: '2023 – 2024', title: 'Horizon 360', feature: true,
+        span: 'md:col-span-2 lg:col-span-4 lg:row-span-2',
+        blurb: 'An org-wide employee feedback platform, taken from blank page to company-wide launch.',
+        metric: ['90%+', 'adoption across Myntra within 3 months'], bar: 90,
+        did: ['Designed, developed and launched the platform from scratch.', 'Shipped on a tight timeline with zero critical defects at go-live.', 'Presented the final rollout to Myntra’s CHRO.'],
+        outcomes: ['90%+ adoption in the first 3 months', 'Best Team Award at Flipkart, shared with Lounge'],
+        tools: ['Product roadmapping', 'Requirements gathering', 'Stakeholder management', 'Agile delivery'],
+      },
+      {
+        id: 'lounge', org: 'Myntra', title: 'Lounge',
+        span: 'lg:col-span-2',
+        blurb: 'Myntra’s employee experience portal.',
+        metric: ['70%', 'adoption in 3 months'], bar: 70,
+        did: ['Led development end to end.', 'Coordinated 7 cross-functional teams through delivery.', 'Went live with zero critical defects.'],
+        outcomes: ['70% adoption in the first 3 months after launch', 'Best Team Award at Flipkart'],
+        tools: ['Cross-functional delivery', 'Agile', 'Release planning'],
+      },
+      {
+        id: 'reflect', org: 'Flipkart', title: 'Reflect',
+        span: 'lg:col-span-2',
+        blurb: 'A revamp of Flipkart’s internal feedback system.',
+        metric: ['100%', 'of P0 incidents resolved within SLA'],
+        did: ['Led the platform revamp as product manager.', 'Owned the product roadmap and release cycles.', 'Ran resolution of every P0 incident within SLA.'],
+        outcomes: ['100% of P0 incidents resolved within SLA'],
+        tools: ['Roadmapping', 'Release management', 'Incident management'],
+      },
+      {
+        id: 'femo', org: 'Flipkart', title: 'Femo',
+        span: 'lg:col-span-2',
+        blurb: '7+ major enhancements conceived and shipped on an internal Flipkart platform.',
+        metric: ['+20%', 'engagement quarter on quarter'],
+        did: ['Conceptualised the enhancement roadmap.', 'Delivered 7+ major enhancements.'],
+        outcomes: ['Platform engagement up 20% quarter on quarter'],
+        tools: ['Feature ideation', 'Product discovery', 'Agile delivery'],
+      },
+      {
+        id: 'rpa-flipkart', org: 'Flipkart', title: 'Automation programme',
+        span: 'lg:col-span-2',
+        blurb: '50+ UiPath automations across HR, CX, Ekart, Jeeves/F1 and Finance.',
+        metric: ['15,000+', 'man-hours saved a year'],
+        did: ['Delivered 50+ RPA automations on UiPath across five business verticals.', 'Managed RPA use cases for 15+ cross-functional processes.'],
+        outcomes: ['15,000+ man-hours saved annually', 'Process turnaround time cut by up to 60%', 'Instant Karma Award'],
+        tools: ['UiPath', 'Process mapping', 'Stakeholder management'],
+      },
+      {
+        id: 'inventory', org: 'Flipkart', title: 'Inventory reconciliation',
+        span: 'lg:col-span-2',
+        blurb: 'Automating a manual, high-volume reconciliation process.',
+        metric: ['97%', 'less manual workload'],
+        did: ['Automated the inventory reconciliation process end to end.'],
+        outcomes: ['Manual workload reduced by 97%', 'Kool and the Gang Award at Flipkart'],
+        tools: ['UiPath', 'Process automation'],
+      },
+      {
+        id: 'ai', org: 'Practice', title: 'AI-assisted prototyping',
+        span: 'lg:col-span-2',
+        blurb: 'Using generative AI tools to turn product ideas into working prototypes quickly.',
+        chips: ['Google AI Studio', 'Cursor', 'ChatGPT', 'Gemini', 'NotebookLM'],
+        did: ['Prototypes ideas rapidly with Google AI Studio and Cursor.', 'Works day to day with ChatGPT, Gemini and NotebookLM.'],
+        outcomes: ['Faster path from idea to something stakeholders can click'],
+        tools: ['Google AI Studio', 'Cursor', 'ChatGPT', 'Gemini', 'NotebookLM'],
+      },
+      {
+        id: 'tcs-rpa', org: 'TCS', title: 'RPA delivery and migration',
+        span: 'lg:col-span-2',
+        blurb: '20+ use cases and 2 platform migrations to Automation Anywhere.',
+        metric: ['100%', 'on-time delivery'],
+        did: ['Led business analysis: BRDs, functional specs, complexity analysis and workflows.', 'Facilitated developer handoffs with zero rework.', 'Planned UAT and ran post-go-live hypercare.'],
+        outcomes: ['100% on-time delivery with full compliance', 'Process execution time down 40%', 'Best Team Award, September 2021'],
+        tools: ['Automation Anywhere', 'BRD and FSD', 'UAT', 'Waterfall'],
+      },
+      {
+        id: 'mdm', org: 'TCS', title: 'Master data management',
+        span: 'lg:col-span-2',
+        blurb: '8 MDM interfaces and 4 key integrations for a global user base.',
+        metric: ['+15%', 'data accuracy'],
+        did: ['Managed 8 interfaces and fully supported 4 key integrations.', 'Ran data mapping, gap analysis and integration rule sign-off.', 'Supported 300+ global users post-deployment via ServiceNow.'],
+        outcomes: ['Data accuracy up 15% across MDM systems', '300+ global users supported'],
+        tools: ['Data mapping', 'Gap analysis', 'ServiceNow', 'Data governance'],
+      },
+    ];
+
+    const CATEGORIES = [
+      { id: 'all', label: 'All', caption: 'Everything I bring to a product team. Pick a domain to see where each skill sits.' },
+      { id: 'strategy', label: 'Product strategy', caption: 'How I decide what to build and get it shipped: roadmaps, requirements and delivery.' },
+      { id: 'tech', label: 'Tech stack', caption: 'Platforms and tools I build, automate and prototype with.' },
+      { id: 'design', label: 'Design', caption: 'How I shape workflows and experiences before they reach engineering.' },
+      { id: 'analytics', label: 'Analytics', caption: 'How I measure, map and reconcile the data behind decisions.' },
+    ];
+
+    const SKILLS = [
+      ['Product roadmapping', 'strategy'], ['Feature ideation', 'strategy design'], ['Requirements gathering', 'strategy'],
+      ['Stakeholder management', 'strategy'], ['Agile delivery', 'strategy'], ['Release management', 'strategy'],
+      ['Incident management', 'strategy'], ['Business analysis', 'strategy analytics'], ['BRD and functional specs', 'strategy'],
+      ['UAT planning', 'strategy'], ['Digital transformation', 'strategy'], ['Employee experience', 'strategy design'],
+      ['UiPath', 'tech'], ['Automation Anywhere', 'tech'], ['Google AI Studio', 'tech design'], ['Cursor', 'tech design'],
+      ['ChatGPT', 'tech'], ['Gemini', 'tech'], ['NotebookLM', 'tech'], ['APIs', 'tech'], ['3-layer architecture', 'tech'],
+      ['ServiceNow', 'tech'], ['JIRA', 'tech strategy'], ['Confluence', 'tech'],
+      ['Process mapping', 'design analytics'], ['Workflow design', 'design'], ['Rapid prototyping', 'design tech'],
+      ['Microsoft Visio', 'design'], ['Draw.io', 'design'], ['PowerPoint', 'design'],
+      ['Google Analytics', 'analytics'], ['Excel', 'analytics'], ['Data mapping', 'analytics'], ['Gap analysis', 'analytics'],
+      ['Complexity analysis', 'analytics strategy'], ['Data governance', 'analytics'], ['Digital marketing', 'analytics'],
+    ].map(([name, cats]) => ({ name, cats: cats.split(' ') }));
+
+    /* ================= Helpers ================= */
+    const $ = (s, el = document) => el.querySelector(s);
+    const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+    const icons = () => window.lucide && lucide.createIcons();
+
+    const toast = (msg) => {
+      const t = $('#toast');
+      t.textContent = msg;
+      t.classList.remove('opacity-0', 'translate-y-4');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => t.classList.add('opacity-0', 'translate-y-4'), 1800);
+    };
+
+    /* ================= Experience timeline ================= */
+    function renderTimeline() {
+      $('#timeline').innerHTML = `
+        <span class="absolute bottom-6 left-[7px] top-6 w-px bg-line" aria-hidden="true"></span>
+        ${EXPERIENCE.map((job, i) => `
+        <li class="relative pl-9 sm:pl-12">
+          <span class="absolute left-0 top-8 grid h-[15px] w-[15px] place-items-center rounded-full border border-line bg-canvas" aria-hidden="true">
+            <span class="h-[7px] w-[7px] rounded-full ${job.current ? 'bg-accent' : 'bg-muted/50'}"></span>
+          </span>
+          <article class="role group rounded-2xl border border-line bg-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/20 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)]" data-open="${i === 0}">
+            <button type="button" class="role-toggle flex w-full items-start justify-between gap-6 p-6 text-left sm:p-8" aria-expanded="${i === 0}" aria-controls="role-${job.id}">
+              <div>
+                <p class="text-sm text-muted">${job.period}${job.current ? ' <span class="ml-1.5 inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Current</span>' : ''}</p>
+                <h3 class="mt-2 text-2xl font-semibold tracking-[-0.03em] sm:text-[1.75rem]">${job.company}</h3>
+                <p class="mt-1 text-[15px] text-muted">${job.role}</p>
+              </div>
+              <span class="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line transition-colors group-hover:border-ink/30">
+                <i data-lucide="chevron-down" class="chev h-4 w-4"></i>
+              </span>
+            </button>
+
+            <dl class="mx-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:mx-8 md:grid-cols-4">
+              ${job.metrics.map(([v, l]) => `
+                <div class="flex flex-col bg-surface p-4">
+                  <dt class="order-2 mt-1 text-[13px] leading-snug text-muted">${l}</dt>
+                  <dd class="order-1 text-2xl font-semibold tracking-[-0.03em]">${v}</dd>
+                </div>`).join('')}
+            </dl>
+
+            <div class="expander" id="role-${job.id}">
+              <div>
+                <div class="space-y-9 px-6 pb-8 pt-8 sm:px-8">
+                  ${job.products ? `
+                  <div>
+                    <h4 class="text-sm font-semibold">Products owned</h4>
+                    <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+                      ${job.products.map(([name, org, text]) => `
+                        <li class="rounded-xl border border-line p-4">
+                          <p class="flex items-baseline justify-between gap-3"><span class="font-semibold">${name}</span><span class="text-xs text-muted">${org}</span></p>
+                          <p class="mt-1.5 text-sm leading-relaxed text-muted">${text}</p>
+                        </li>`).join('')}
+                    </ul>
+                  </div>` : ''}
+                  ${job.groups.map(([title, items]) => `
+                  <div>
+                    <h4 class="text-sm font-semibold">${title}</h4>
+                    <ul class="mt-3 space-y-2.5">
+                      ${items.map(t => `<li class="relative max-w-[70ch] pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent">${t}</li>`).join('')}
+                    </ul>
+                  </div>`).join('')}
+                  <div>
+                    <h4 class="text-sm font-semibold">Core competencies</h4>
+                    <ul class="mt-3 flex flex-wrap gap-2">
+                      ${job.competencies.map(c => `<li class="rounded-full border border-line px-3 py-1 text-[13px] text-muted">${c}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="h-6 sm:h-8" data-spacer></div>
+          </article>
+        </li>`).join('')}`;
+
+      $$('.role-toggle').forEach(btn => btn.addEventListener('click', () => setRole(btn.closest('.role'), btn.getAttribute('aria-expanded') !== 'true')));
+    }
+
+    function setRole(card, open) {
+      card.dataset.open = open;
+      $('.role-toggle', card).setAttribute('aria-expanded', open);
+      syncExpandAll();
+    }
+
+    function syncExpandAll() {
+      const allOpen = $$('.role').every(c => c.dataset.open === 'true');
+      $('#expand-all').textContent = allOpen ? 'Collapse all roles' : 'Expand all roles';
+    }
+
+    $('#expand-all').addEventListener('click', () => {
+      const allOpen = $$('.role').every(c => c.dataset.open === 'true');
+      $$('.role').forEach(c => setRole(c, !allOpen));
+    });
+
+    /* ================= Projects bento ================= */
+    function renderBento() {
+      $('#bento').innerHTML = PROJECTS.map(p => {
+        const metric = p.metric ? `
+          <div class="${p.feature ? 'mt-10' : 'mt-6'}">
+            <p class="${p.feature ? 'text-[clamp(4rem,9vw,7.5rem)] leading-[.85] tracking-[-0.06em]' : 'text-3xl tracking-[-0.04em]'} font-semibold ${p.bar ? 'text-accent' : ''}">${p.metric[0]}</p>
+            <p class="mt-2 text-sm text-muted">${p.metric[1]}</p>
+            ${p.bar ? `<div class="mt-4 h-1.5 overflow-hidden rounded-full bg-line" role="img" aria-label="${p.bar}% adoption"><div class="h-full rounded-full bg-accent" style="width:${p.bar}%"></div></div>` : ''}
+          </div>` : '';
+        const chips = p.chips ? `<ul class="mt-6 flex flex-wrap gap-1.5">${p.chips.map(c => `<li class="rounded-full bg-canvas px-2.5 py-1 text-xs text-muted ring-1 ring-line">${c}</li>`).join('')}</ul>` : '';
+        return `
+          <button type="button" data-project="${p.id}" class="group relative flex flex-col justify-between rounded-2xl border border-line bg-surface p-6 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/25 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)] sm:p-7 ${p.feature ? 'sm:p-9' : ''} ${p.span}">
+            <div>
+              <div class="flex items-center justify-between gap-3 text-sm text-muted">
+                <span>${p.org}</span>
+                <i data-lucide="arrow-up-right" class="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"></i>
+              </div>
+              <h3 class="mt-3 font-semibold tracking-[-0.03em] ${p.feature ? 'text-3xl sm:text-4xl' : 'text-xl'}">${p.title}</h3>
+              <p class="mt-2 max-w-[44ch] leading-relaxed text-muted ${p.feature ? 'text-[17px]' : 'text-[15px]'}">${p.blurb}</p>
+            </div>
+            ${metric}${chips}
+          </button>`;
+      }).join('');
+
+      $$('[data-project]').forEach(el => el.addEventListener('click', () => openProject(el.dataset.project, el)));
+    }
+
+    const dialog = $('#project-dialog');
+    let lastTrigger = null;
+
+    function openProject(id, trigger) {
+      const p = PROJECTS.find(x => x.id === id);
+      lastTrigger = trigger;
+      $('#dlg-org').textContent = p.org;
+      $('#dlg-title').textContent = p.title;
+      $('#dlg-body').innerHTML = `
+        <p class="text-[17px] leading-relaxed">${p.blurb}</p>
+        ${p.metric ? `<div class="mt-6 flex items-baseline gap-3 rounded-2xl bg-accent-soft px-5 py-4"><span class="text-3xl font-semibold tracking-[-0.04em] text-accent">${p.metric[0]}</span><span class="text-sm text-ink/80">${p.metric[1]}</span></div>` : ''}
+        <h4 class="mt-8 text-sm font-semibold">What I did</h4>
+        <ul class="mt-3 space-y-2">${p.did.map(t => `<li class="relative pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent">${t}</li>`).join('')}</ul>
+        <h4 class="mt-7 text-sm font-semibold">Outcome</h4>
+        <ul class="mt-3 space-y-2">${p.outcomes.map(t => `<li class="flex gap-2.5 text-[15px] leading-relaxed"><i data-lucide="check" class="mt-1 h-4 w-4 shrink-0 text-accent"></i><span>${t}</span></li>`).join('')}</ul>
+        <h4 class="mt-7 text-sm font-semibold">Skills and tools</h4>
+        <ul class="mt-3 flex flex-wrap gap-2">${p.tools.map(t => `<li class="rounded-full border border-line px-3 py-1 text-[13px] text-muted">${t}</li>`).join('')}</ul>`;
+      icons();
+      dialog.showModal();
+      dialog.scrollTop = 0;
+    }
+
+    dialog.addEventListener('click', e => { if (e.target === dialog || e.target.closest('[data-close]')) dialog.close(); });
+    dialog.addEventListener('close', () => lastTrigger && lastTrigger.focus());
+
+    /* ================= Skills matrix ================= */
+    let activeCat = 'all';
+
+    function renderSkills() {
+      $('#skill-filters').innerHTML = CATEGORIES.map(c => {
+        const count = c.id === 'all' ? SKILLS.length : SKILLS.filter(s => s.cats.includes(c.id)).length;
+        return `<button type="button" data-cat="${c.id}" aria-pressed="${c.id === activeCat}"
+          class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas border-line hover:border-ink/40">
+          ${c.label}<span class="text-xs tabular-nums opacity-60">${count}</span></button>`;
+      }).join('');
+
+      $('#skill-cloud').innerHTML = SKILLS.map(s =>
+        `<li class="skill rounded-full border border-line bg-surface px-4 py-2 text-[15px]" data-cats="${s.cats.join(' ')}">${s.name}</li>`
+      ).join('');
+
+      $$('[data-cat]').forEach(b => b.addEventListener('click', () => setCategory(b.dataset.cat)));
+      setCategory(activeCat);
+    }
+
+    function setCategory(id) {
+      activeCat = id;
+      $$('[data-cat]').forEach(b => b.setAttribute('aria-pressed', b.dataset.cat === id));
+      $$('.skill').forEach(el => {
+        const hit = id !== 'all' && el.dataset.cats.split(' ').includes(id);
+        el.dataset.hit = hit;
+        el.dataset.dim = id !== 'all' && !hit;
+      });
+      $('#skill-caption').textContent = CATEGORIES.find(c => c.id === id).caption;
+    }
+
+    /* ================= Print resume ================= */
+    function renderPrint() {
+      const cat = id => SKILLS.filter(s => s.cats[0] === id).map(s => s.name).join(', ');
+      const fk = EXPERIENCE[0], tcs = EXPERIENCE[1];
+      $('#print-resume').innerHTML = `
+        <h1>Aditya Shankar Sengupta</h1>
+        <p class="p-sub">Product Manager and RPA Consultant</p>
+        <p class="p-contact">adityashankar.sengupta@gmail.com &nbsp;|&nbsp; +91 97020 05351 &nbsp;|&nbsp; linkedin.com/in/adityasengupta0209 &nbsp;|&nbsp; Navi Mumbai, India</p>
+
+        <h2>Summary</h2>
+        <p>Associate product manager and business analyst with 4.5 years driving product strategy, digital transformation and process automation at scale. Leading 4 internal products at Flipkart and Myntra; 60+ automation deployments on UiPath and Automation Anywhere, saving thousands of operational hours across global teams.</p>
+
+        <h2>Experience</h2>
+        <div class="p-role">${fk.legal}, ${fk.role}<span>${fk.period}</span></div>
+        <ul>
+          ${fk.products.map(([n, o, t]) => `<li><b>${n} (${o}):</b> ${t}</li>`).join('')}
+          <li><b>RPA consulting:</b> 50+ UiPath automations across HR, CX, Ekart, Jeeves/F1 and Finance; 15,000+ man-hours saved a year and turnaround time cut by up to 60%.</li>
+          <li>Delivered Horizon 360 and Lounge on tight timelines with zero critical defects at go-live; shortened requirement sign-off through structured stakeholder feedback loops.</li>
+        </ul>
+        <div class="p-role">${tcs.legal}, ${tcs.role}<span>${tcs.period}</span></div>
+        <ul>
+          <li><b>RPA delivery:</b> 20+ use cases and 2 migrations to Automation Anywhere, 100% on time; owned BRDs, functional specs, complexity analysis, UAT and hypercare with zero development rework.</li>
+          <li><b>Master data management:</b> 8 MDM interfaces and 4 key integrations; data mapping, gap analysis and integration rules; 300+ global users supported via ServiceNow.</li>
+          <li>Cut process execution time by 40%; improved MDM data accuracy by 15%; weekly status reporting to IT leadership.</li>
+        </ul>
+
+        <h2>Skills</h2>
+        <p class="p-row"><b>Product strategy:</b> ${cat('strategy')}</p>
+        <p class="p-row"><b>Tech stack:</b> ${cat('tech')}</p>
+        <p class="p-row"><b>Design:</b> ${cat('design')}</p>
+        <p class="p-row"><b>Analytics:</b> ${cat('analytics')}</p>
+
+        <div class="p-grid">
+          <div>
+            <h2>Education</h2>
+            <p class="p-row"><b>MBA, Analytics and Marketing</b>, KIIT School of Management, 2021</p>
+            <p class="p-row"><b>B.Tech, E&amp;TC</b>, Kalinga Institute of Industrial Technology, 2019</p>
+            <p class="p-row">Pursuing IIM Kozhikode Professional Certificate in Product Management; online certifications in Digital Marketing, Google Analytics and Excel</p>
+          </div>
+          <div>
+            <h2>Recognition</h2>
+            <p class="p-row"><b>Kool and the Gang Award</b> (Flipkart): inventory reconciliation automation, 97% less manual work</p>
+            <p class="p-row"><b>Best Team Award</b> (Flipkart): launch of Horizon 360 and Lounge</p>
+            <p class="p-row"><b>Instant Karma Award</b> (Flipkart): RPA for 15+ cross-functional processes</p>
+            <p class="p-row"><b>Best Team Award</b> (TCS), September 2021</p>
+          </div>
+        </div>`;
+    }
+
+    /* ================= Chrome: theme, header, nav, copy ================= */
+    const themeBtn = $('#theme-toggle');
+    const syncThemeLabel = () => {
+      const dark = document.documentElement.classList.contains('dark');
+      themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+      $('meta[name="theme-color"]').setAttribute('content', dark ? '#0F0F0E' : '#FAFAF9');
+    };
+    themeBtn.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+      syncThemeLabel();
+    });
+
+    const header = $('#site-header');
+    const onScroll = () => header.classList.toggle('border-line', window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    const navLinks = $$('.nav-link');
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        navLinks.forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + en.target.id));
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    ['about', 'experience', 'projects', 'skills'].forEach(id => spy.observe(document.getElementById(id)));
+
+    document.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-copy]');
+      if (!btn) return;
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        toast('Email address copied');
+      } catch (err) {
+        toast(btn.dataset.copy);
+      }
+    });
+
+    /* ================= Boot ================= */
+    renderTimeline();
+    renderBento();
+    renderSkills();
+    renderPrint();
+    syncExpandAll();
+    syncThemeLabel();
+    onScroll();
+    icons();
+  </script>
+</body>
+</html>
