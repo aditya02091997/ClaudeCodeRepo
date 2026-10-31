@@ -129,6 +129,10 @@
     @keyframes pop { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     [role="tabpanel"]:not([hidden]) { animation: fade .25s ease; }
     @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    /* KPI numbers scale to the slide's width and their own length, so "15,000+" never overflows */
+    .kpi-body { container-type: inline-size; }
+    .kpi-value { font-size: clamp(1.5rem, calc(94cqi / var(--ems, 3.6)), 4.75rem); } /* --ems: measured width of the number in ems */
+
     /* KPI carousel: the active dot fills while autoplay counts down */
     .kpi-dot { position: relative; height: 6px; width: 6px; border-radius: 999px; background: rgb(var(--line)); overflow: hidden; transition: width .3s ease; }
     .kpi-dot[aria-current="true"] { width: 22px; }
@@ -777,9 +781,9 @@
     function renderKpis() {
       kpiTrack.innerHTML = KPIS.map((p, i) => `
         <div class="flex w-full shrink-0 snap-start flex-col justify-center px-5 sm:px-6" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${KPIS.length}: ${p.title}">
-          <button type="button" data-kpi="${p.id}" class="group/kpi block w-full text-left">
+          <button type="button" data-kpi="${p.id}" class="kpi-body group/kpi block w-full text-left">
             <span class="block text-[13px] text-muted"><span class="font-medium text-ink group-hover/kpi:underline group-hover/kpi:underline-offset-4">${p.title}</span>, ${p.org}</span>
-            <span class="mt-2 block text-[clamp(2.75rem,5.2vw,4.75rem)] font-semibold leading-none tracking-[-0.06em] text-accent">${p.metric[0]}</span>
+            <span class="kpi-value mt-2 block whitespace-nowrap font-semibold leading-none tracking-[-0.06em] text-accent">${p.metric[0]}</span>
             <span class="mt-2 block text-[13px] leading-snug text-muted sm:text-sm">${p.metric[1]}</span>
             ${p.bar ? `<span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-line"><span class="block h-full rounded-full bg-accent" style="width:${p.bar}%"></span></span>` : ''}
           </button>
@@ -795,6 +799,19 @@
       $$('[data-dot]').forEach(d => d.addEventListener('click', () => kpiGo(+d.dataset.dot)));
       kpiTile.style.setProperty('--kpi-ms', KPI_MS + 'ms');
       kpiSetActive(0);
+      kpiMeasure();
+      if (document.fonts) document.fonts.ready.then(kpiMeasure); // re-measure once the real font is in
+    }
+
+    // Measure each number's natural width (in ems) once; CSS then scales it to whatever width the tile has
+    function kpiMeasure() {
+      $$('.kpi-value').forEach(el => {
+        el.style.fontSize = '100px';
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        el.style.setProperty('--ems', (range.getBoundingClientRect().width / 100).toFixed(3));
+        el.style.fontSize = '';
+      });
     }
 
     function kpiSetActive(i) {
