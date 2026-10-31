@@ -54,6 +54,7 @@
     .tile-arrow { @apply h-4 w-4 text-muted transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent; }
     .dash-list > li { @apply relative pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent; }
     .chip { @apply rounded-full border border-line px-3 py-1 text-[13px] text-muted; }
+    .kpi-btn { @apply grid h-8 w-8 place-items-center rounded-full border border-line text-muted transition-colors hover:border-ink/40 hover:text-ink; }
   </style>
 
   <style>
@@ -128,6 +129,12 @@
     @keyframes pop { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     [role="tabpanel"]:not([hidden]) { animation: fade .25s ease; }
     @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    /* KPI carousel: the active dot fills while autoplay counts down */
+    .kpi-dot { position: relative; height: 6px; width: 6px; border-radius: 999px; background: rgb(var(--line)); overflow: hidden; transition: width .3s ease; }
+    .kpi-dot[aria-current="true"] { width: 22px; }
+    .kpi-dot[aria-current="true"]::after { content: ''; position: absolute; inset: 0; background: rgb(var(--accent)); border-radius: inherit; }
+    .kpi-running .kpi-dot[aria-current="true"]::after { transform-origin: left; animation: kpi-fill var(--kpi-ms, 3800ms) linear both; }
+    @keyframes kpi-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
 
@@ -221,7 +228,7 @@
 
     <!-- Category tiles: each opens the panel on its tab -->
     <div class="mt-6 grid flex-1 grid-cols-2 gap-3 sm:gap-4 lg:mt-10 lg:grid-cols-4 lg:grid-rows-2" aria-label="Explore">
-      <button type="button" data-open="experience" class="tile group reveal col-span-2" style="--d:340ms">
+      <button type="button" data-open="experience" class="tile group reveal order-1 col-span-2 lg:order-none" style="--d:340ms">
         <span class="tile-head"><span>Experience</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
         <span class="mt-4 block sm:mt-6">
           <span class="block text-lg font-semibold leading-snug tracking-[-0.03em] sm:text-2xl">Product Manager and RPA Consultant, Flipkart</span>
@@ -234,31 +241,39 @@
         </span>
       </button>
 
-      <button type="button" data-open="about" class="tile group reveal" style="--d:400ms">
+      <button type="button" data-open="about" class="tile group reveal order-3 lg:order-none" style="--d:400ms">
         <span class="tile-head"><span>About</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
         <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">4.5 years where product meets process.</span>
         <span class="mt-4 flex items-center gap-1.5 text-[13px] text-muted"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> Navi Mumbai</span>
       </button>
 
-      <button type="button" data-open="projects" class="tile group reveal lg:row-span-2" style="--d:460ms">
-        <span class="tile-head"><span>Projects</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
-        <span class="mt-4 block sm:mt-6">
-          <span class="block text-[clamp(2.25rem,5vw,4.75rem)] font-semibold leading-none tracking-[-0.06em] text-accent">90%+</span>
-          <span class="mt-2 block text-[13px] leading-snug text-muted sm:text-sm">of Myntra adopted Horizon 360 within 3 months</span>
-          <span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-line"><span class="block h-full w-[90%] rounded-full bg-accent"></span></span>
-        </span>
-        <span class="mt-4 block text-[13px] text-muted sm:text-sm">Horizon 360 and 8 more case studies</span>
-      </button>
+      <!-- Projects: auto-scrolling KPI carousel. Swipe on touch, buttons on desktop. -->
+      <section id="kpi-tile" class="tile reveal order-2 col-span-2 lg:order-none lg:col-span-1 lg:row-span-2" style="--d:460ms" aria-roledescription="carousel" aria-label="Key results from my projects">
+        <button type="button" data-open="projects" class="tile-head group w-full text-left">
+          <span>Projects</span><i data-lucide="arrow-up-right" class="tile-arrow"></i>
+        </button>
+        <div id="kpi-track" class="no-scrollbar -mx-5 mt-3 flex flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain sm:-mx-6" tabindex="-1"></div>
+        <div class="mt-4 flex items-center justify-between gap-3">
+          <div id="kpi-dots" class="flex items-center gap-1.5"></div>
+          <div class="flex items-center gap-1">
+            <button type="button" id="kpi-toggle" class="kpi-btn" aria-label="Pause auto-scroll">
+              <i data-lucide="pause" class="kpi-pause h-3.5 w-3.5"></i><i data-lucide="play" class="kpi-play hidden h-3.5 w-3.5"></i>
+            </button>
+            <button type="button" id="kpi-prev" class="kpi-btn" aria-label="Previous result"><i data-lucide="chevron-left" class="h-4 w-4"></i></button>
+            <button type="button" id="kpi-next" class="kpi-btn" aria-label="Next result"><i data-lucide="chevron-right" class="h-4 w-4"></i></button>
+          </div>
+        </div>
+      </section>
 
-      <button type="button" data-open="skills" class="tile group reveal sm:col-span-2" style="--d:520ms">
+      <button type="button" data-open="skills" class="tile group reveal order-5 col-span-2 lg:order-none" style="--d:520ms">
         <span class="tile-head"><span>Skills</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
-        <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">37 skills<span class="hidden sm:inline"> across product strategy, tech, design and analytics</span><span class="sm:hidden"> in 4 domains</span></span>
-        <span class="mt-4 hidden h-[30px] flex-wrap gap-1.5 overflow-hidden sm:flex" aria-hidden="true">
+        <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">37 skills across product strategy, tech, design and analytics</span>
+        <span class="mt-4 flex h-[30px] flex-wrap gap-1.5 overflow-hidden" aria-hidden="true">
           <span class="chip">Product roadmapping</span><span class="chip">UiPath</span><span class="chip">Stakeholder management</span><span class="chip">Google AI Studio</span><span class="chip">Process mapping</span><span class="chip">Agile delivery</span><span class="chip">Data mapping</span>
         </span>
       </button>
 
-      <button type="button" data-open="education" class="tile group reveal sm:col-span-2 lg:col-span-1" style="--d:580ms">
+      <button type="button" data-open="education" class="tile group reveal order-4 lg:order-none" style="--d:580ms">
         <span class="tile-head"><span>Education and awards</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
         <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">MBA, KIIT School of Management</span>
         <span class="mt-4 flex items-center gap-1.5 text-[13px] text-muted"><i data-lucide="award" class="h-3.5 w-3.5 text-accent"></i> 4 awards at Flipkart and TCS</span>
@@ -592,6 +607,7 @@
       selectTab(id);
       if (!panel.open) panel.showModal();
       $('#tab-' + id).focus();
+      kpiSchedule();
     }
 
     $$('[data-open]').forEach(b => b.addEventListener('click', () => openPanel(b.dataset.open, b)));
@@ -608,7 +624,7 @@
     });
 
     panel.addEventListener('click', e => { if (e.target === panel || e.target.closest('[data-close]')) panel.close(); });
-    panel.addEventListener('close', () => { setHash(''); lastTrigger && lastTrigger.focus(); });
+    panel.addEventListener('close', () => { setHash(''); lastTrigger && lastTrigger.focus(); kpiSchedule(); });
 
     /* ================= Experience timeline ================= */
     function renderTimeline() {
@@ -750,6 +766,95 @@
       $('#project-back').focus();
     }
 
+    /* ================= KPI carousel (Projects tile) ================= */
+    const KPIS = PROJECTS.filter(p => p.metric);
+    const KPI_MS = 3800;
+    const kpiTile = $('#kpi-tile');
+    const kpiTrack = $('#kpi-track');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const kpi = { index: 0, timer: null, playing: !reduceMotion, hover: false, touch: false };
+
+    function renderKpis() {
+      kpiTrack.innerHTML = KPIS.map((p, i) => `
+        <div class="flex w-full shrink-0 snap-start flex-col justify-center px-5 sm:px-6" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${KPIS.length}: ${p.title}">
+          <button type="button" data-kpi="${p.id}" class="group/kpi block w-full text-left">
+            <span class="block text-[13px] text-muted"><span class="font-medium text-ink group-hover/kpi:underline group-hover/kpi:underline-offset-4">${p.title}</span>, ${p.org}</span>
+            <span class="mt-2 block text-[clamp(2.75rem,5.2vw,4.75rem)] font-semibold leading-none tracking-[-0.06em] text-accent">${p.metric[0]}</span>
+            <span class="mt-2 block text-[13px] leading-snug text-muted sm:text-sm">${p.metric[1]}</span>
+            ${p.bar ? `<span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-line"><span class="block h-full rounded-full bg-accent" style="width:${p.bar}%"></span></span>` : ''}
+          </button>
+        </div>`).join('');
+
+      $('#kpi-dots').innerHTML = KPIS.map((p, i) =>
+        `<button type="button" class="kpi-dot" data-dot="${i}" aria-label="Show result ${i + 1}: ${p.title}"></button>`).join('');
+
+      $$('[data-kpi]').forEach(b => b.addEventListener('click', () => {
+        openPanel('projects', b);
+        showProject(b.dataset.kpi);
+      }));
+      $$('[data-dot]').forEach(d => d.addEventListener('click', () => kpiGo(+d.dataset.dot)));
+      kpiTile.style.setProperty('--kpi-ms', KPI_MS + 'ms');
+      kpiSetActive(0);
+    }
+
+    function kpiSetActive(i) {
+      kpi.index = i;
+      $$('[data-dot]').forEach(d => d.setAttribute('aria-current', +d.dataset.dot === i));
+    }
+
+    function kpiGo(i, { user = true } = {}) {
+      const n = KPIS.length;
+      i = (i + n) % n;
+      kpiTrack.scrollTo({ left: i * kpiTrack.clientWidth, behavior: reduceMotion ? 'auto' : 'smooth' });
+      kpiSetActive(i);
+      if (user) kpiSchedule(); // a manual move restarts the countdown
+    }
+
+    // Autoplay only while nobody is looking at or touching the carousel
+    function kpiSchedule() {
+      clearTimeout(kpi.timer);
+      const keyboardFocus = kpiTile.contains(document.activeElement) && document.activeElement.matches(':focus-visible');
+      const run = kpi.playing && !kpi.hover && !kpi.touch && !keyboardFocus && !document.hidden && !panel.open;
+      kpiTile.classList.remove('kpi-running');
+      if (!run) return;
+      void kpiTile.offsetWidth; // restart the dot fill animation
+      kpiTile.classList.add('kpi-running');
+      kpi.timer = setTimeout(() => { kpiGo(kpi.index + 1, { user: false }); kpiSchedule(); }, KPI_MS);
+    }
+
+    // Keep dots in sync with manual swipes / trackpad scrolls
+    let kpiRaf = 0;
+    kpiTrack.addEventListener('scroll', () => {
+      cancelAnimationFrame(kpiRaf);
+      kpiRaf = requestAnimationFrame(() => {
+        const i = Math.round(kpiTrack.scrollLeft / kpiTrack.clientWidth);
+        if (i !== kpi.index) { kpiSetActive(i); kpiSchedule(); }
+      });
+    }, { passive: true });
+
+    $('#kpi-prev').addEventListener('click', () => kpiGo(kpi.index - 1));
+    $('#kpi-next').addEventListener('click', () => kpiGo(kpi.index + 1));
+    $('#kpi-toggle').addEventListener('click', () => {
+      kpi.playing = !kpi.playing;
+      $('#kpi-toggle').setAttribute('aria-label', kpi.playing ? 'Pause auto-scroll' : 'Play auto-scroll');
+      $('.kpi-pause', kpiTile).classList.toggle('hidden', !kpi.playing);
+      $('.kpi-play', kpiTile).classList.toggle('hidden', kpi.playing);
+      kpiSchedule();
+    });
+
+    kpiTile.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { kpi.hover = true; kpiSchedule(); } });
+    kpiTile.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { kpi.hover = false; kpiSchedule(); } });
+    kpiTrack.addEventListener('touchstart', () => { kpi.touch = true; kpiSchedule(); }, { passive: true });
+    kpiTrack.addEventListener('touchend', () => { kpi.touch = false; kpiSchedule(); }, { passive: true });
+    kpiTile.addEventListener('focusin', kpiSchedule);
+    kpiTile.addEventListener('focusout', () => setTimeout(kpiSchedule));
+    kpiTile.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); kpiGo(kpi.index + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); kpiGo(kpi.index - 1); }
+    });
+    document.addEventListener('visibilitychange', kpiSchedule);
+    window.addEventListener('resize', () => { kpiTrack.scrollLeft = kpi.index * kpiTrack.clientWidth; });
+
     /* ================= Skills matrix ================= */
     let activeCat = 'all';
 
@@ -858,6 +963,7 @@
     const fromHash = location.hash.slice(1);
     renderTimeline();
     renderBento();
+    renderKpis();
     renderSkills();
     renderPrint();
     syncExpandAll();
@@ -865,6 +971,7 @@
     icons();
     if (TABS.includes(fromHash)) openPanel(fromHash);
     else { selectTab('about'); setHash(''); }
+    kpiSchedule();
   </script>
 </body>
 </html>
