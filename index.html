@@ -45,6 +45,17 @@
   </script>
   <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
 
+  <style type="text/tailwindcss">
+    /* Shared tile + card surface */
+    .tile {
+      @apply relative flex flex-col justify-between rounded-2xl border border-line bg-surface p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/25 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)] sm:p-6;
+    }
+    .tile-head { @apply flex items-center justify-between gap-3 text-sm font-medium; }
+    .tile-arrow { @apply h-4 w-4 text-muted transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent; }
+    .dash-list > li { @apply relative pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent; }
+    .chip { @apply rounded-full border border-line px-3 py-1 text-[13px] text-muted; }
+  </style>
+
   <style>
     /* ---------- Design tokens ---------- */
     :root {
@@ -68,7 +79,6 @@
       color-scheme: dark;
     }
 
-    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
     body {
       background: rgb(var(--canvas));
       color: rgb(var(--ink));
@@ -76,21 +86,22 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
+    html:has(dialog[open]) { overflow: hidden; }
     ::selection { background: rgb(var(--accent) / .22); }
     :focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 3px; border-radius: 6px; }
 
     /* Hero name: the one loud moment on the page */
     .display {
-      font-size: clamp(3.25rem, 11vw, 9.5rem);
-      line-height: .88;
+      font-size: clamp(3.1rem, 8.6vw, 7.75rem);
+      line-height: .9;
       letter-spacing: -0.055em;
       font-weight: 600;
     }
     .display .thin { font-weight: 300; color: rgb(var(--muted)); }
 
-    /* Page-load sequence (hero only) */
-    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-    .reveal { animation: rise .9s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
+    /* Page-load sequence */
+    @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    .reveal { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0ms); }
 
     /* Collapsible role cards: animates to auto height */
     .expander { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.2,.7,.2,1); }
@@ -104,20 +115,23 @@
     .skill[data-dim="true"] { opacity: .28; }
     .skill[data-hit="true"] { background: rgb(var(--accent-soft)); border-color: rgb(var(--accent) / .45); color: rgb(var(--accent)); }
 
-    /* Project dialog */
-    dialog::backdrop { background: rgb(17 17 17 / .45); backdrop-filter: blur(4px); }
-    dialog[open] { animation: pop .28s cubic-bezier(.2,.7,.2,1); }
-    @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
-
-    .nav-link[aria-current="true"] { color: rgb(var(--ink)); }
-    .nav-link[aria-current="true"]::after { transform: scaleX(1); }
-    .nav-link::after {
-      content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 1.5px;
-      background: rgb(var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform .3s ease;
+    /* Panel: bottom sheet on phones, centred sheet from tablet up */
+    dialog.panel {
+      margin: auto auto 0; width: 100%; max-width: 100%;
+      height: 92dvh; max-height: 92dvh; border-radius: 24px 24px 0 0; padding: 0;
     }
+    @media (min-width: 768px) {
+      dialog.panel { margin: auto; width: min(1040px, calc(100vw - 3rem)); height: min(88vh, 860px); border-radius: 24px; }
+    }
+    dialog::backdrop { background: rgb(17 17 17 / .45); backdrop-filter: blur(4px); }
+    dialog[open] { animation: pop .3s cubic-bezier(.2,.7,.2,1); }
+    @keyframes pop { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    [role="tabpanel"]:not([hidden]) { animation: fade .25s ease; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
 
     @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
 
@@ -150,18 +164,18 @@
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-canvas">Skip to content</a>
 
   <!-- ===================== Header ===================== -->
-  <header id="site-header" class="sticky top-0 z-50 border-b border-transparent bg-canvas/80 backdrop-blur-xl transition-colors duration-300">
+  <header class="sticky top-0 z-40 bg-canvas/80 backdrop-blur-xl">
     <div class="mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
-      <a href="#top" class="flex items-center gap-2.5" aria-label="Aditya Sengupta, back to top">
+      <a href="./" class="flex items-center gap-2.5" aria-label="Aditya Sengupta, home">
         <span class="grid h-8 w-8 place-items-center rounded-full bg-ink text-[11px] font-semibold tracking-tight text-canvas">AS</span>
-        <span class="hidden text-sm font-semibold tracking-tight md:inline">Aditya Sengupta</span>
+        <span class="hidden text-sm font-semibold tracking-tight sm:inline">Aditya Sengupta</span>
       </a>
 
-      <nav aria-label="Sections" class="flex items-center gap-3.5 text-[13px] sm:gap-7 sm:text-sm">
-        <a href="#about" class="nav-link relative text-muted transition-colors hover:text-ink">About</a>
-        <a href="#experience" class="nav-link relative text-muted transition-colors hover:text-ink">Experience</a>
-        <a href="#projects" class="nav-link relative text-muted transition-colors hover:text-ink">Projects</a>
-        <a href="#skills" class="nav-link relative text-muted transition-colors hover:text-ink">Skills</a>
+      <nav aria-label="Sections" class="hidden items-center gap-7 text-sm md:flex">
+        <button type="button" data-open="about" class="text-muted transition-colors hover:text-ink">About</button>
+        <button type="button" data-open="experience" class="text-muted transition-colors hover:text-ink">Experience</button>
+        <button type="button" data-open="projects" class="text-muted transition-colors hover:text-ink">Projects</button>
+        <button type="button" data-open="skills" class="text-muted transition-colors hover:text-ink">Skills</button>
       </nav>
 
       <div class="flex items-center gap-2">
@@ -176,205 +190,192 @@
     </div>
   </header>
 
-  <main id="main">
-    <!-- ===================== Hero ===================== -->
-    <section id="top" class="mx-auto max-w-[1320px] px-4 pb-20 pt-14 sm:px-8 sm:pt-20 lg:px-12 lg:pb-28 lg:pt-24">
-      <h1 class="display reveal" style="--d:60ms">
-        Aditya<br /><span class="thin">Sengupta</span>
-      </h1>
+  <!-- ===================== Home: one screen ===================== -->
+  <main id="main" class="mx-auto flex max-w-[1320px] flex-col px-4 pb-6 pt-4 sm:px-8 lg:min-h-[calc(100dvh-4rem-1px)] lg:px-12 lg:pb-10 lg:pt-8">
+    <h1 class="display reveal" style="--d:40ms">Aditya <span class="thin">Sengupta</span></h1>
 
-      <div class="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-12 lg:gap-10">
-        <div class="lg:col-span-7">
-          <p class="reveal max-w-[34ch] text-[1.45rem] font-normal leading-snug tracking-[-0.015em] sm:text-[1.9rem]" style="--d:220ms">
-            Product manager and RPA consultant at Flipkart. I build internal products that employees choose to use, then automate the work around them.
-          </p>
-
-          <div class="reveal mt-9 flex flex-wrap items-center gap-2.5" style="--d:360ms">
-            <a href="Aditya-Sengupta-Resume.pdf" download class="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-transform hover:-translate-y-px active:translate-y-0">
-              <i data-lucide="download" class="h-4 w-4"></i> Download resume (PDF)
-            </a>
-            <div class="inline-flex items-center rounded-full border border-line bg-surface">
-              <a href="mailto:adityashankar.sengupta@gmail.com" class="inline-flex items-center gap-2 py-2.5 pl-4 pr-2 text-sm transition-colors hover:text-accent">
-                <i data-lucide="mail" class="h-4 w-4"></i> Email
-              </a>
-              <button type="button" data-copy="adityashankar.sengupta@gmail.com" class="mr-1 grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-canvas hover:text-ink" aria-label="Copy email address">
-                <i data-lucide="copy" class="h-3.5 w-3.5"></i>
-              </button>
-            </div>
-            <a href="https://www.linkedin.com/in/adityasengupta0209" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
-              <i data-lucide="linkedin" class="h-4 w-4"></i> LinkedIn
-            </a>
-            <a href="tel:+919702005351" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
-              <i data-lucide="phone" class="h-4 w-4"></i> +91 97020 05351
-            </a>
-          </div>
+    <div class="mt-4 grid items-end gap-5 sm:mt-6 lg:mt-8 lg:grid-cols-12">
+      <p class="reveal max-w-[40ch] text-lg leading-snug tracking-[-0.01em] sm:text-xl lg:col-span-5" style="--d:160ms">
+        Product manager and RPA consultant at Flipkart. I build internal products employees choose to use, then automate the work around them.
+      </p>
+      <div class="reveal flex flex-wrap items-center gap-2 lg:col-span-7 lg:justify-end" style="--d:260ms">
+        <a href="Aditya-Sengupta-Resume.pdf" download class="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-canvas transition-transform hover:-translate-y-px active:translate-y-0">
+          <i data-lucide="download" class="h-4 w-4"></i> Download resume
+        </a>
+        <div class="inline-flex items-center rounded-full border border-line bg-surface">
+          <a href="mailto:adityashankar.sengupta@gmail.com" class="inline-flex items-center gap-2 py-2.5 pl-4 pr-2 text-sm transition-colors hover:text-accent">
+            <i data-lucide="mail" class="h-4 w-4"></i> Email
+          </a>
+          <button type="button" data-copy="adityashankar.sengupta@gmail.com" class="mr-1 grid h-8 w-8 place-items-center rounded-full text-muted transition-colors hover:bg-canvas hover:text-ink" aria-label="Copy email address">
+            <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+          </button>
         </div>
-
-        <aside class="reveal lg:col-span-4 lg:col-start-9" style="--d:480ms" aria-label="At a glance">
-          <dl class="divide-y divide-line border-y border-line text-[15px]">
-            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
-              <dt class="text-muted">Now</dt>
-              <dd>Leading 4 internal products across Flipkart and Myntra</dd>
-            </div>
-            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
-              <dt class="text-muted">Learning</dt>
-              <dd>Professional Certificate in Product Management, IIM Kozhikode</dd>
-            </div>
-            <div class="grid grid-cols-[6.5rem_1fr] gap-4 py-4">
-              <dt class="text-muted">Based in</dt>
-              <dd class="flex items-center gap-1.5"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> Navi Mumbai, India</dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
-    </section>
-
-    <!-- ===================== About ===================== -->
-    <section id="about" class="border-t border-line">
-      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
-        <h2 class="text-sm font-medium text-muted lg:col-span-3">About</h2>
-        <div class="lg:col-span-9">
-          <p class="max-w-[60ch] text-xl leading-relaxed tracking-[-0.01em] sm:text-2xl sm:leading-[1.55]">
-            For 4.5 years I've worked where product meets process: first as a business analyst at TCS delivering automation for global clients, and now at Flipkart, owning four internal products used across Flipkart and Myntra.
-          </p>
-          <p class="mt-6 max-w-[64ch] text-[17px] leading-[1.75] text-muted">
-            I translate complex business needs into products that scale, get cross-functional teams pulling in one direction, and ship in agile cycles. Alongside product work I've led 60+ automation deployments on UiPath and Automation Anywhere, saving thousands of operational hours for teams around the world.
-          </p>
-
-          <dl class="mt-14 grid grid-cols-2 border-t border-line md:grid-cols-4">
-            <div class="flex flex-col border-b border-line py-6 pr-4 md:border-b-0">
-              <dt class="order-2 mt-2 text-sm leading-snug text-muted">years across product and business analysis</dt>
-              <dd class="order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">4.5</dd>
-            </div>
-            <div class="flex flex-col border-b border-l border-line py-6 pl-4 md:border-b-0 md:pr-4">
-              <dt class="mt-2 text-sm leading-snug text-muted">automations shipped on UiPath and Automation Anywhere</dt>
-              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">60+</dd>
-            </div>
-            <div class="flex flex-col border-line py-6 pr-4 md:border-l md:pl-4">
-              <dt class="mt-2 text-sm leading-snug text-muted">hours saved a year at Flipkart through automation</dt>
-              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">15k+</dd>
-            </div>
-            <div class="flex flex-col border-l border-line py-6 pl-4">
-              <dt class="mt-2 text-sm leading-snug text-muted">of Myntra adopted Horizon 360 in three months</dt>
-              <dd class="-order-1 text-4xl font-semibold tracking-[-0.04em] text-accent sm:text-5xl">90%+</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== Experience ===================== -->
-    <section id="experience" class="border-t border-line">
-      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
-        <div class="lg:col-span-3">
-          <h2 class="text-sm font-medium text-muted">Experience</h2>
-          <p class="mt-3 max-w-[28ch] text-sm leading-relaxed text-muted">Open a role to see the products, programmes and results behind it.</p>
-          <button id="expand-all" type="button" class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent underline-offset-4 hover:underline">Expand all roles</button>
-        </div>
-        <ol id="timeline" class="relative space-y-6 lg:col-span-9" aria-label="Work history, most recent first"></ol>
-      </div>
-    </section>
-
-    <!-- ===================== Projects ===================== -->
-    <section id="projects" class="border-t border-line">
-      <div class="mx-auto max-w-[1320px] px-4 py-20 sm:px-8 lg:px-12 lg:py-28">
-        <div class="grid gap-6 lg:grid-cols-12">
-          <h2 class="text-sm font-medium text-muted lg:col-span-3">Projects</h2>
-          <p class="max-w-[52ch] text-xl leading-relaxed tracking-[-0.01em] lg:col-span-9 sm:text-2xl">
-            Products launched, platforms revamped and automation programmes run. Select any one for the full story.
-          </p>
-        </div>
-        <div id="bento" class="mt-12 grid auto-rows-[minmax(220px,auto)] grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6"></div>
-      </div>
-    </section>
-
-    <!-- ===================== Skills ===================== -->
-    <section id="skills" class="border-t border-line">
-      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
-        <div class="lg:col-span-3">
-          <h2 class="text-sm font-medium text-muted">Skills</h2>
-          <p id="skill-caption" class="mt-3 max-w-[30ch] text-sm leading-relaxed text-muted" aria-live="polite"></p>
-        </div>
-        <div class="lg:col-span-9">
-          <div id="skill-filters" role="toolbar" aria-label="Filter skills by domain" class="flex flex-wrap gap-2"></div>
-          <ul id="skill-cloud" class="mt-8 flex flex-wrap gap-2.5" aria-label="Skills and tools"></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== Education & recognition ===================== -->
-    <section id="education" class="border-t border-line">
-      <div class="mx-auto grid max-w-[1320px] gap-10 px-4 py-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-28">
-        <h2 class="text-sm font-medium text-muted lg:col-span-3">Education and recognition</h2>
-        <div class="grid gap-12 md:grid-cols-2 lg:col-span-9">
-          <div>
-            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="graduation-cap" class="h-4 w-4 text-accent"></i> Education</h3>
-            <ul class="mt-5 divide-y divide-line border-y border-line">
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">MBA, Analytics and Marketing</p><span class="text-sm tabular-nums text-muted">2021</span></div>
-                <p class="mt-1 text-sm text-muted">KIIT School of Management, KIIT Deemed to be University</p>
-              </li>
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">B.Tech, Electronics and Telecommunication</p><span class="text-sm tabular-nums text-muted">2019</span></div>
-                <p class="mt-1 text-sm text-muted">Kalinga Institute of Industrial Technology, KIIT Deemed to be University</p>
-              </li>
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Professional Certificate in Product Management</p><span class="text-sm text-accent">In progress</span></div>
-                <p class="mt-1 text-sm text-muted">IIM Kozhikode. Also certified online in Digital Marketing, Google Analytics and Excel.</p>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="award" class="h-4 w-4 text-accent"></i> Recognition</h3>
-            <ul class="mt-5 divide-y divide-line border-y border-line">
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Kool and the Gang Award</p><span class="text-sm text-muted">Flipkart</span></div>
-                <p class="mt-1 text-sm text-muted">Automated inventory reconciliation, cutting manual workload by 97%.</p>
-              </li>
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">Flipkart</span></div>
-                <p class="mt-1 text-sm text-muted">For launching Horizon 360 and Lounge.</p>
-              </li>
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Instant Karma Award</p><span class="text-sm text-muted">Flipkart</span></div>
-                <p class="mt-1 text-sm text-muted">Managing RPA use cases for 15+ cross-functional processes.</p>
-              </li>
-              <li class="py-5">
-                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">TCS, Sep 2021</span></div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===================== Footer ===================== -->
-  <footer class="border-t border-line">
-    <div class="mx-auto flex max-w-[1320px] flex-col gap-8 px-4 py-16 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12">
-      <div>
-        <p class="text-muted">Open to product management roles.</p>
-        <a href="mailto:adityashankar.sengupta@gmail.com" class="mt-2 inline-block break-all text-2xl font-semibold tracking-[-0.03em] decoration-accent decoration-2 underline-offset-[6px] hover:underline sm:text-4xl">adityashankar.sengupta@gmail.com</a>
-      </div>
-      <div class="flex items-center gap-6 text-sm text-muted">
-        <a href="https://www.linkedin.com/in/adityasengupta0209" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 hover:text-ink">LinkedIn <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i></a>
-        <a href="#top" class="hover:text-ink">Back to top</a>
+        <a href="https://www.linkedin.com/in/adityasengupta0209" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
+          <i data-lucide="linkedin" class="h-4 w-4"></i> LinkedIn
+        </a>
+        <a href="tel:+919702005351" class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm transition-colors hover:text-accent">
+          <i data-lucide="phone" class="h-4 w-4"></i> <span class="hidden sm:inline">+91 97020 05351</span><span class="sm:hidden">Call</span>
+        </a>
       </div>
     </div>
-  </footer>
 
-  <!-- ===================== Project dialog ===================== -->
-  <dialog id="project-dialog" aria-labelledby="dlg-title" class="m-auto w-[min(640px,calc(100vw-2rem))] max-h-[min(86vh,760px)] overflow-y-auto rounded-3xl border border-line bg-surface p-0 text-ink shadow-2xl">
-    <div class="sticky top-0 flex items-start justify-between gap-4 border-b border-line bg-surface/95 px-6 py-5 backdrop-blur sm:px-8">
-      <div>
-        <p id="dlg-org" class="text-sm text-muted"></p>
-        <h3 id="dlg-title" class="mt-1 text-2xl font-semibold tracking-[-0.03em]"></h3>
+    <!-- Category tiles: each opens the panel on its tab -->
+    <div class="mt-6 grid flex-1 grid-cols-2 gap-3 sm:gap-4 lg:mt-10 lg:grid-cols-4 lg:grid-rows-2" aria-label="Explore">
+      <button type="button" data-open="experience" class="tile group reveal col-span-2" style="--d:340ms">
+        <span class="tile-head"><span>Experience</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+        <span class="mt-4 block sm:mt-6">
+          <span class="block text-lg font-semibold leading-snug tracking-[-0.03em] sm:text-2xl">Product Manager and RPA Consultant, Flipkart</span>
+          <span class="mt-1 block text-sm text-muted">Since Aug 2023. Previously Business Analyst at TCS.</span>
+        </span>
+        <span class="mt-5 hidden grid-cols-3 gap-3 border-t border-line pt-4 sm:grid">
+          <span><span class="block text-xl font-semibold tracking-[-0.03em] sm:text-2xl">4</span><span class="block text-xs leading-snug text-muted sm:text-[13px]">internal products</span></span>
+          <span><span class="block text-xl font-semibold tracking-[-0.03em] sm:text-2xl">60+</span><span class="block text-xs leading-snug text-muted sm:text-[13px]">automations shipped</span></span>
+          <span><span class="block text-xl font-semibold tracking-[-0.03em] sm:text-2xl">15k+</span><span class="block text-xs leading-snug text-muted sm:text-[13px]">hours saved a year</span></span>
+        </span>
+      </button>
+
+      <button type="button" data-open="about" class="tile group reveal" style="--d:400ms">
+        <span class="tile-head"><span>About</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+        <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">4.5 years where product meets process.</span>
+        <span class="mt-4 flex items-center gap-1.5 text-[13px] text-muted"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> Navi Mumbai</span>
+      </button>
+
+      <button type="button" data-open="projects" class="tile group reveal lg:row-span-2" style="--d:460ms">
+        <span class="tile-head"><span>Projects</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+        <span class="mt-4 block sm:mt-6">
+          <span class="block text-[clamp(2.25rem,5vw,4.75rem)] font-semibold leading-none tracking-[-0.06em] text-accent">90%+</span>
+          <span class="mt-2 block text-[13px] leading-snug text-muted sm:text-sm">of Myntra adopted Horizon 360 within 3 months</span>
+          <span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-line"><span class="block h-full w-[90%] rounded-full bg-accent"></span></span>
+        </span>
+        <span class="mt-4 block text-[13px] text-muted sm:text-sm">Horizon 360 and 8 more case studies</span>
+      </button>
+
+      <button type="button" data-open="skills" class="tile group reveal sm:col-span-2" style="--d:520ms">
+        <span class="tile-head"><span>Skills</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+        <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">37 skills<span class="hidden sm:inline"> across product strategy, tech, design and analytics</span><span class="sm:hidden"> in 4 domains</span></span>
+        <span class="mt-4 hidden h-[30px] flex-wrap gap-1.5 overflow-hidden sm:flex" aria-hidden="true">
+          <span class="chip">Product roadmapping</span><span class="chip">UiPath</span><span class="chip">Stakeholder management</span><span class="chip">Google AI Studio</span><span class="chip">Process mapping</span><span class="chip">Agile delivery</span><span class="chip">Data mapping</span>
+        </span>
+      </button>
+
+      <button type="button" data-open="education" class="tile group reveal sm:col-span-2 lg:col-span-1" style="--d:580ms">
+        <span class="tile-head"><span>Education and awards</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+        <span class="mt-4 block sm:mt-6 text-base font-semibold leading-snug tracking-[-0.02em] sm:text-lg">MBA, KIIT School of Management</span>
+        <span class="mt-4 flex items-center gap-1.5 text-[13px] text-muted"><i data-lucide="award" class="h-3.5 w-3.5 text-accent"></i> 4 awards at Flipkart and TCS</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- ===================== Panel: all detail lives here ===================== -->
+  <dialog id="panel" class="panel flex-col border border-line bg-surface text-ink shadow-2xl open:flex" aria-label="Resume details">
+    <div class="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-6">
+      <div role="tablist" aria-label="Resume sections" class="no-scrollbar -my-1 flex flex-1 gap-1 overflow-x-auto py-1">
+        <button role="tab" id="tab-about" aria-controls="tp-about" data-tab="about" class="tab">About</button>
+        <button role="tab" id="tab-experience" aria-controls="tp-experience" data-tab="experience" class="tab">Experience</button>
+        <button role="tab" id="tab-projects" aria-controls="tp-projects" data-tab="projects" class="tab">Projects</button>
+        <button role="tab" id="tab-skills" aria-controls="tp-skills" data-tab="skills" class="tab">Skills</button>
+        <button role="tab" id="tab-education" aria-controls="tp-education" data-tab="education" class="tab">Education and awards</button>
       </div>
       <button type="button" data-close class="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line hover:border-ink/40" aria-label="Close">
         <i data-lucide="x" class="h-4 w-4"></i>
       </button>
     </div>
-    <div id="dlg-body" class="px-6 pb-8 pt-6 sm:px-8"></div>
+
+    <div id="panel-body" class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-7 sm:px-8 sm:py-9">
+      <!-- About -->
+      <section role="tabpanel" id="tp-about" aria-labelledby="tab-about" hidden>
+        <div class="grid gap-10 md:grid-cols-12">
+          <div class="md:col-span-7">
+            <p class="text-xl leading-relaxed tracking-[-0.01em] sm:text-[1.4rem]">
+              For 4.5 years I've worked where product meets process: first as a business analyst at TCS delivering automation for global clients, and now at Flipkart, owning four internal products used across Flipkart and Myntra.
+            </p>
+            <p class="mt-5 text-[16px] leading-[1.75] text-muted">
+              I translate complex business needs into products that scale, get cross-functional teams pulling in one direction, and ship in agile cycles. Alongside product work I've led 60+ automation deployments on UiPath and Automation Anywhere, saving thousands of operational hours for teams around the world.
+            </p>
+          </div>
+          <dl class="divide-y divide-line self-start border-y border-line text-[15px] md:col-span-5">
+            <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Now</dt><dd>Leading 4 internal products across Flipkart and Myntra</dd></div>
+            <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Learning</dt><dd>Professional Certificate in Product Management, IIM Kozhikode</dd></div>
+            <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Based in</dt><dd>Navi Mumbai, India</dd></div>
+            <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Email</dt><dd class="break-all"><a class="underline decoration-line underline-offset-4 hover:decoration-accent" href="mailto:adityashankar.sengupta@gmail.com">adityashankar.sengupta@gmail.com</a></dd></div>
+          </dl>
+        </div>
+        <dl class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
+          <div class="flex flex-col bg-surface p-5"><dt class="order-2 mt-1.5 text-[13px] leading-snug text-muted">years across product and business analysis</dt><dd class="order-1 text-3xl font-semibold tracking-[-0.04em]">4.5</dd></div>
+          <div class="flex flex-col bg-surface p-5"><dt class="order-2 mt-1.5 text-[13px] leading-snug text-muted">automations on UiPath and Automation Anywhere</dt><dd class="order-1 text-3xl font-semibold tracking-[-0.04em]">60+</dd></div>
+          <div class="flex flex-col bg-surface p-5"><dt class="order-2 mt-1.5 text-[13px] leading-snug text-muted">hours saved a year at Flipkart</dt><dd class="order-1 text-3xl font-semibold tracking-[-0.04em]">15k+</dd></div>
+          <div class="flex flex-col bg-surface p-5"><dt class="order-2 mt-1.5 text-[13px] leading-snug text-muted">Horizon 360 adoption in 3 months</dt><dd class="order-1 text-3xl font-semibold tracking-[-0.04em] text-accent">90%+</dd></div>
+        </dl>
+      </section>
+
+      <!-- Experience -->
+      <section role="tabpanel" id="tp-experience" aria-labelledby="tab-experience" hidden>
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <p class="text-sm text-muted">Open a role to see the products and results behind it.</p>
+          <button id="expand-all" type="button" class="shrink-0 text-sm font-medium text-accent underline-offset-4 hover:underline">Expand all</button>
+        </div>
+        <ol id="timeline" class="relative space-y-5" aria-label="Work history, most recent first"></ol>
+      </section>
+
+      <!-- Projects: list, then drill-down detail -->
+      <section role="tabpanel" id="tp-projects" aria-labelledby="tab-projects" hidden>
+        <div id="projects-list">
+          <p class="mb-6 text-sm text-muted">Select a project for the full story.</p>
+          <div id="bento" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </div>
+        <div id="project-detail" hidden></div>
+      </section>
+
+      <!-- Skills -->
+      <section role="tabpanel" id="tp-skills" aria-labelledby="tab-skills" hidden>
+        <div id="skill-filters" role="toolbar" aria-label="Filter skills by domain" class="flex flex-wrap gap-2"></div>
+        <p id="skill-caption" class="mt-5 text-sm text-muted" aria-live="polite"></p>
+        <ul id="skill-cloud" class="mt-6 flex flex-wrap gap-2" aria-label="Skills and tools"></ul>
+      </section>
+
+      <!-- Education and awards -->
+      <section role="tabpanel" id="tp-education" aria-labelledby="tab-education" hidden>
+        <div class="grid gap-10 md:grid-cols-2">
+          <div>
+            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="graduation-cap" class="h-4 w-4 text-accent"></i> Education</h3>
+            <ul class="mt-4 divide-y divide-line border-y border-line">
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">MBA, Analytics and Marketing</p><span class="text-sm tabular-nums text-muted">2021</span></div>
+                <p class="mt-1 text-sm text-muted">KIIT School of Management, KIIT Deemed to be University</p>
+              </li>
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">B.Tech, Electronics and Telecommunication</p><span class="text-sm tabular-nums text-muted">2019</span></div>
+                <p class="mt-1 text-sm text-muted">Kalinga Institute of Industrial Technology, KIIT Deemed to be University</p>
+              </li>
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Professional Certificate in Product Management</p><span class="shrink-0 text-sm text-accent">In progress</span></div>
+                <p class="mt-1 text-sm text-muted">IIM Kozhikode. Also certified online in Digital Marketing, Google Analytics and Excel.</p>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="flex items-center gap-2 text-base font-semibold"><i data-lucide="award" class="h-4 w-4 text-accent"></i> Awards</h3>
+            <ul class="mt-4 divide-y divide-line border-y border-line">
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Kool and the Gang Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">Automated inventory reconciliation, cutting manual workload by 97%.</p>
+              </li>
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">For launching Horizon 360 and Lounge.</p>
+              </li>
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Instant Karma Award</p><span class="text-sm text-muted">Flipkart</span></div>
+                <p class="mt-1 text-sm text-muted">Managing RPA use cases for 15+ cross-functional processes.</p>
+              </li>
+              <li class="py-4">
+                <div class="flex items-baseline justify-between gap-4"><p class="font-medium">Best Team Award</p><span class="text-sm text-muted">TCS, Sep 2021</span></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
   </dialog>
 
   <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 translate-y-4 rounded-full bg-ink px-4 py-2 text-sm text-canvas opacity-0 transition-all duration-300"></div>
@@ -384,7 +385,7 @@
 
   <script>
     /* =========================================================
-       Content: single source for timeline, bento, skills, print
+       Content: single source for panel, skills and print
        ========================================================= */
     const EXPERIENCE = [
       {
@@ -455,8 +456,7 @@
 
     const PROJECTS = [
       {
-        id: 'horizon', org: 'Myntra', period: '2023 – 2024', title: 'Horizon 360', feature: true,
-        span: 'md:col-span-2 lg:col-span-4 lg:row-span-2',
+        id: 'horizon', org: 'Myntra', title: 'Horizon 360', feature: true, span: 'sm:col-span-2',
         blurb: 'An org-wide employee feedback platform, taken from blank page to company-wide launch.',
         metric: ['90%+', 'adoption across Myntra within 3 months'], bar: 90,
         did: ['Designed, developed and launched the platform from scratch.', 'Shipped on a tight timeline with zero critical defects at go-live.', 'Presented the final rollout to Myntra’s CHRO.'],
@@ -465,7 +465,6 @@
       },
       {
         id: 'lounge', org: 'Myntra', title: 'Lounge',
-        span: 'lg:col-span-2',
         blurb: 'Myntra’s employee experience portal.',
         metric: ['70%', 'adoption in 3 months'], bar: 70,
         did: ['Led development end to end.', 'Coordinated 7 cross-functional teams through delivery.', 'Went live with zero critical defects.'],
@@ -474,7 +473,6 @@
       },
       {
         id: 'reflect', org: 'Flipkart', title: 'Reflect',
-        span: 'lg:col-span-2',
         blurb: 'A revamp of Flipkart’s internal feedback system.',
         metric: ['100%', 'of P0 incidents resolved within SLA'],
         did: ['Led the platform revamp as product manager.', 'Owned the product roadmap and release cycles.', 'Ran resolution of every P0 incident within SLA.'],
@@ -483,7 +481,6 @@
       },
       {
         id: 'femo', org: 'Flipkart', title: 'Femo',
-        span: 'lg:col-span-2',
         blurb: '7+ major enhancements conceived and shipped on an internal Flipkart platform.',
         metric: ['+20%', 'engagement quarter on quarter'],
         did: ['Conceptualised the enhancement roadmap.', 'Delivered 7+ major enhancements.'],
@@ -492,7 +489,6 @@
       },
       {
         id: 'rpa-flipkart', org: 'Flipkart', title: 'Automation programme',
-        span: 'lg:col-span-2',
         blurb: '50+ UiPath automations across HR, CX, Ekart, Jeeves/F1 and Finance.',
         metric: ['15,000+', 'man-hours saved a year'],
         did: ['Delivered 50+ RPA automations on UiPath across five business verticals.', 'Managed RPA use cases for 15+ cross-functional processes.'],
@@ -501,7 +497,6 @@
       },
       {
         id: 'inventory', org: 'Flipkart', title: 'Inventory reconciliation',
-        span: 'lg:col-span-2',
         blurb: 'Automating a manual, high-volume reconciliation process.',
         metric: ['97%', 'less manual workload'],
         did: ['Automated the inventory reconciliation process end to end.'],
@@ -509,8 +504,7 @@
         tools: ['UiPath', 'Process automation'],
       },
       {
-        id: 'ai', org: 'Practice', title: 'AI-assisted prototyping',
-        span: 'lg:col-span-2',
+        id: 'ai', org: 'Practice', title: 'AI-assisted prototyping', span: 'lg:col-span-2',
         blurb: 'Using generative AI tools to turn product ideas into working prototypes quickly.',
         chips: ['Google AI Studio', 'Cursor', 'ChatGPT', 'Gemini', 'NotebookLM'],
         did: ['Prototypes ideas rapidly with Google AI Studio and Cursor.', 'Works day to day with ChatGPT, Gemini and NotebookLM.'],
@@ -519,7 +513,6 @@
       },
       {
         id: 'tcs-rpa', org: 'TCS', title: 'RPA delivery and migration',
-        span: 'lg:col-span-2',
         blurb: '20+ use cases and 2 platform migrations to Automation Anywhere.',
         metric: ['100%', 'on-time delivery'],
         did: ['Led business analysis: BRDs, functional specs, complexity analysis and workflows.', 'Facilitated developer handoffs with zero rework.', 'Planned UAT and ran post-go-live hypercare.'],
@@ -527,8 +520,7 @@
         tools: ['Automation Anywhere', 'BRD and FSD', 'UAT', 'Waterfall'],
       },
       {
-        id: 'mdm', org: 'TCS', title: 'Master data management',
-        span: 'lg:col-span-2',
+        id: 'mdm', org: 'TCS', title: 'Master data management', span: 'lg:col-span-2',
         blurb: '8 MDM interfaces and 4 key integrations for a global user base.',
         metric: ['+15%', 'data accuracy'],
         did: ['Managed 8 interfaces and fully supported 4 key integrations.', 'Ran data mapping, gap analysis and integration rule sign-off.', 'Supported 300+ global users post-deployment via ServiceNow.'],
@@ -572,44 +564,90 @@
       toast._t = setTimeout(() => t.classList.add('opacity-0', 'translate-y-4'), 1800);
     };
 
+    /* ================= Panel + tabs ================= */
+    const TABS = ['about', 'experience', 'projects', 'skills', 'education'];
+    const panel = $('#panel');
+    const panelBody = $('#panel-body');
+    let lastTrigger = null;
+
+    const setHash = (h) => { try { history.replaceState(null, '', location.href.split('#')[0] + (h ? '#' + h : '')); } catch (e) {} };
+
+    function selectTab(id) {
+      $$('[role="tab"]').forEach(t => {
+        const on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', on);
+        t.tabIndex = on ? 0 : -1;
+        t.className = 'tab shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ' +
+          (on ? 'bg-ink text-canvas' : 'text-muted hover:bg-canvas hover:text-ink');
+      });
+      TABS.forEach(t => { $('#tp-' + t).hidden = t !== id; });
+      if (id === 'projects') showProjectList();
+      panelBody.scrollTop = 0;
+      $('#tab-' + id).scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      setHash(id);
+    }
+
+    function openPanel(id, trigger) {
+      lastTrigger = trigger || null;
+      selectTab(id);
+      if (!panel.open) panel.showModal();
+      $('#tab-' + id).focus();
+    }
+
+    $$('[data-open]').forEach(b => b.addEventListener('click', () => openPanel(b.dataset.open, b)));
+    $$('[role="tab"]').forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+
+    // Arrow keys move between tabs
+    $('[role="tablist"]').addEventListener('keydown', e => {
+      const i = TABS.indexOf(document.activeElement.dataset.tab);
+      if (i < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      const n = e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+      selectTab(TABS[n]);
+      $('#tab-' + TABS[n]).focus();
+    });
+
+    panel.addEventListener('click', e => { if (e.target === panel || e.target.closest('[data-close]')) panel.close(); });
+    panel.addEventListener('close', () => { setHash(''); lastTrigger && lastTrigger.focus(); });
+
     /* ================= Experience timeline ================= */
     function renderTimeline() {
       $('#timeline').innerHTML = `
         <span class="absolute bottom-6 left-[7px] top-6 w-px bg-line" aria-hidden="true"></span>
         ${EXPERIENCE.map((job, i) => `
-        <li class="relative pl-9 sm:pl-12">
-          <span class="absolute left-0 top-8 grid h-[15px] w-[15px] place-items-center rounded-full border border-line bg-canvas" aria-hidden="true">
+        <li class="relative pl-8 sm:pl-10">
+          <span class="absolute left-0 top-7 grid h-[15px] w-[15px] place-items-center rounded-full border border-line bg-surface" aria-hidden="true">
             <span class="h-[7px] w-[7px] rounded-full ${job.current ? 'bg-accent' : 'bg-muted/50'}"></span>
           </span>
-          <article class="role group rounded-2xl border border-line bg-surface transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/20 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)]" data-open="${i === 0}">
-            <button type="button" class="role-toggle flex w-full items-start justify-between gap-6 p-6 text-left sm:p-8" aria-expanded="${i === 0}" aria-controls="role-${job.id}">
+          <article class="role group rounded-2xl border border-line bg-canvas/40 transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/20 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)]" data-open="${i === 0}">
+            <button type="button" class="role-toggle flex w-full items-start justify-between gap-6 p-5 text-left sm:p-6" aria-expanded="${i === 0}" aria-controls="role-${job.id}">
               <div>
                 <p class="text-sm text-muted">${job.period}${job.current ? ' <span class="ml-1.5 inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span>Current</span>' : ''}</p>
-                <h3 class="mt-2 text-2xl font-semibold tracking-[-0.03em] sm:text-[1.75rem]">${job.company}</h3>
-                <p class="mt-1 text-[15px] text-muted">${job.role}</p>
+                <h3 class="mt-1.5 text-xl font-semibold tracking-[-0.03em] sm:text-2xl">${job.company}</h3>
+                <p class="mt-0.5 text-[15px] text-muted">${job.role}</p>
               </div>
               <span class="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-line transition-colors group-hover:border-ink/30">
                 <i data-lucide="chevron-down" class="chev h-4 w-4"></i>
               </span>
             </button>
 
-            <dl class="mx-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:mx-8 md:grid-cols-4">
+            <dl class="mx-5 mb-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:mx-6 sm:mb-6 md:grid-cols-4">
               ${job.metrics.map(([v, l]) => `
-                <div class="flex flex-col bg-surface p-4">
-                  <dt class="order-2 mt-1 text-[13px] leading-snug text-muted">${l}</dt>
-                  <dd class="order-1 text-2xl font-semibold tracking-[-0.03em]">${v}</dd>
+                <div class="flex flex-col bg-surface p-3.5">
+                  <dt class="order-2 mt-0.5 text-[13px] leading-snug text-muted">${l}</dt>
+                  <dd class="order-1 text-xl font-semibold tracking-[-0.03em]">${v}</dd>
                 </div>`).join('')}
             </dl>
 
             <div class="expander" id="role-${job.id}">
               <div>
-                <div class="space-y-9 px-6 pb-8 pt-8 sm:px-8">
+                <div class="space-y-8 px-5 pb-6 sm:px-6">
                   ${job.products ? `
                   <div>
                     <h4 class="text-sm font-semibold">Products owned</h4>
-                    <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <ul class="mt-3 grid gap-3 sm:grid-cols-2">
                       ${job.products.map(([name, org, text]) => `
-                        <li class="rounded-xl border border-line p-4">
+                        <li class="rounded-xl border border-line bg-surface p-4">
                           <p class="flex items-baseline justify-between gap-3"><span class="font-semibold">${name}</span><span class="text-xs text-muted">${org}</span></p>
                           <p class="mt-1.5 text-sm leading-relaxed text-muted">${text}</p>
                         </li>`).join('')}
@@ -618,20 +656,15 @@
                   ${job.groups.map(([title, items]) => `
                   <div>
                     <h4 class="text-sm font-semibold">${title}</h4>
-                    <ul class="mt-3 space-y-2.5">
-                      ${items.map(t => `<li class="relative max-w-[70ch] pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent">${t}</li>`).join('')}
-                    </ul>
+                    <ul class="dash-list mt-3 max-w-[72ch] space-y-2">${items.map(t => `<li>${t}</li>`).join('')}</ul>
                   </div>`).join('')}
                   <div>
                     <h4 class="text-sm font-semibold">Core competencies</h4>
-                    <ul class="mt-3 flex flex-wrap gap-2">
-                      ${job.competencies.map(c => `<li class="rounded-full border border-line px-3 py-1 text-[13px] text-muted">${c}</li>`).join('')}
-                    </ul>
+                    <ul class="mt-3 flex flex-wrap gap-2">${job.competencies.map(c => `<li class="chip">${c}</li>`).join('')}</ul>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="h-6 sm:h-8" data-spacer></div>
           </article>
         </li>`).join('')}`;
 
@@ -646,7 +679,7 @@
 
     function syncExpandAll() {
       const allOpen = $$('.role').every(c => c.dataset.open === 'true');
-      $('#expand-all').textContent = allOpen ? 'Collapse all roles' : 'Expand all roles';
+      $('#expand-all').textContent = allOpen ? 'Collapse all' : 'Expand all';
     }
 
     $('#expand-all').addEventListener('click', () => {
@@ -654,57 +687,68 @@
       $$('.role').forEach(c => setRole(c, !allOpen));
     });
 
-    /* ================= Projects bento ================= */
+    /* ================= Projects: grid + drill-down ================= */
     function renderBento() {
       $('#bento').innerHTML = PROJECTS.map(p => {
         const metric = p.metric ? `
-          <div class="${p.feature ? 'mt-10' : 'mt-6'}">
-            <p class="${p.feature ? 'text-[clamp(4rem,9vw,7.5rem)] leading-[.85] tracking-[-0.06em]' : 'text-3xl tracking-[-0.04em]'} font-semibold ${p.bar ? 'text-accent' : ''}">${p.metric[0]}</p>
-            <p class="mt-2 text-sm text-muted">${p.metric[1]}</p>
-            ${p.bar ? `<div class="mt-4 h-1.5 overflow-hidden rounded-full bg-line" role="img" aria-label="${p.bar}% adoption"><div class="h-full rounded-full bg-accent" style="width:${p.bar}%"></div></div>` : ''}
-          </div>` : '';
-        const chips = p.chips ? `<ul class="mt-6 flex flex-wrap gap-1.5">${p.chips.map(c => `<li class="rounded-full bg-canvas px-2.5 py-1 text-xs text-muted ring-1 ring-line">${c}</li>`).join('')}</ul>` : '';
+          <span class="mt-5 block">
+            <span class="block ${p.feature ? 'text-5xl sm:text-6xl tracking-[-0.06em]' : 'text-2xl tracking-[-0.04em]'} font-semibold leading-none ${p.bar ? 'text-accent' : ''}">${p.metric[0]}</span>
+            <span class="mt-1.5 block text-[13px] text-muted">${p.metric[1]}</span>
+            ${p.bar ? `<span class="mt-3 block h-1.5 overflow-hidden rounded-full bg-line"><span class="block h-full rounded-full bg-accent" style="width:${p.bar}%"></span></span>` : ''}
+          </span>` : '';
+        const chips = p.chips ? `<span class="mt-5 flex flex-wrap gap-1.5">${p.chips.map(c => `<span class="rounded-full bg-canvas px-2.5 py-1 text-xs text-muted ring-1 ring-line">${c}</span>`).join('')}</span>` : '';
         return `
-          <button type="button" data-project="${p.id}" class="group relative flex flex-col justify-between rounded-2xl border border-line bg-surface p-6 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-ink/25 hover:shadow-[0_14px_40px_-20px_rgb(17_17_17/0.25)] sm:p-7 ${p.feature ? 'sm:p-9' : ''} ${p.span}">
-            <div>
-              <div class="flex items-center justify-between gap-3 text-sm text-muted">
-                <span>${p.org}</span>
-                <i data-lucide="arrow-up-right" class="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"></i>
-              </div>
-              <h3 class="mt-3 font-semibold tracking-[-0.03em] ${p.feature ? 'text-3xl sm:text-4xl' : 'text-xl'}">${p.title}</h3>
-              <p class="mt-2 max-w-[44ch] leading-relaxed text-muted ${p.feature ? 'text-[17px]' : 'text-[15px]'}">${p.blurb}</p>
-            </div>
+          <button type="button" data-project="${p.id}" class="tile group bg-canvas/40 ${p.span || ''}">
+            <span class="block">
+              <span class="tile-head font-normal text-muted"><span>${p.org}</span><i data-lucide="arrow-up-right" class="tile-arrow"></i></span>
+              <span class="mt-2 block font-semibold tracking-[-0.03em] ${p.feature ? 'text-2xl' : 'text-lg'}">${p.title}</span>
+              <span class="mt-1 block text-sm leading-relaxed text-muted">${p.blurb}</span>
+            </span>
             ${metric}${chips}
           </button>`;
       }).join('');
 
-      $$('[data-project]').forEach(el => el.addEventListener('click', () => openProject(el.dataset.project, el)));
+      $$('[data-project]').forEach(el => el.addEventListener('click', () => showProject(el.dataset.project)));
     }
 
-    const dialog = $('#project-dialog');
-    let lastTrigger = null;
+    function showProjectList() {
+      $('#project-detail').hidden = true;
+      $('#projects-list').hidden = false;
+    }
 
-    function openProject(id, trigger) {
+    function showProject(id) {
       const p = PROJECTS.find(x => x.id === id);
-      lastTrigger = trigger;
-      $('#dlg-org').textContent = p.org;
-      $('#dlg-title').textContent = p.title;
-      $('#dlg-body').innerHTML = `
-        <p class="text-[17px] leading-relaxed">${p.blurb}</p>
-        ${p.metric ? `<div class="mt-6 flex items-baseline gap-3 rounded-2xl bg-accent-soft px-5 py-4"><span class="text-3xl font-semibold tracking-[-0.04em] text-accent">${p.metric[0]}</span><span class="text-sm text-ink/80">${p.metric[1]}</span></div>` : ''}
-        <h4 class="mt-8 text-sm font-semibold">What I did</h4>
-        <ul class="mt-3 space-y-2">${p.did.map(t => `<li class="relative pl-5 text-[15px] leading-relaxed text-ink/80 before:absolute before:left-0 before:top-[0.7em] before:h-px before:w-2.5 before:bg-accent">${t}</li>`).join('')}</ul>
-        <h4 class="mt-7 text-sm font-semibold">Outcome</h4>
-        <ul class="mt-3 space-y-2">${p.outcomes.map(t => `<li class="flex gap-2.5 text-[15px] leading-relaxed"><i data-lucide="check" class="mt-1 h-4 w-4 shrink-0 text-accent"></i><span>${t}</span></li>`).join('')}</ul>
-        <h4 class="mt-7 text-sm font-semibold">Skills and tools</h4>
-        <ul class="mt-3 flex flex-wrap gap-2">${p.tools.map(t => `<li class="rounded-full border border-line px-3 py-1 text-[13px] text-muted">${t}</li>`).join('')}</ul>`;
+      const d = $('#project-detail');
+      d.innerHTML = `
+        <button type="button" id="project-back" class="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-sm font-medium hover:border-ink/40">
+          <i data-lucide="arrow-left" class="h-4 w-4"></i> All projects
+        </button>
+        <div class="mt-7 grid gap-10 md:grid-cols-12">
+          <div class="md:col-span-7">
+            <p class="text-sm text-muted">${p.org}</p>
+            <h3 class="mt-1 text-3xl font-semibold tracking-[-0.04em]">${p.title}</h3>
+            <p class="mt-3 text-[17px] leading-relaxed">${p.blurb}</p>
+            <h4 class="mt-8 text-sm font-semibold">What I did</h4>
+            <ul class="dash-list mt-3 space-y-2">${p.did.map(t => `<li>${t}</li>`).join('')}</ul>
+          </div>
+          <div class="md:col-span-5">
+            ${p.metric ? `<div class="rounded-2xl bg-accent-soft px-5 py-5"><p class="text-4xl font-semibold tracking-[-0.05em] text-accent">${p.metric[0]}</p><p class="mt-1 text-sm text-ink/80">${p.metric[1]}</p></div>` : ''}
+            <h4 class="mt-7 text-sm font-semibold ${p.metric ? '' : 'md:mt-0'}">Outcome</h4>
+            <ul class="mt-3 space-y-2">${p.outcomes.map(t => `<li class="flex gap-2.5 text-[15px] leading-relaxed"><i data-lucide="check" class="mt-1 h-4 w-4 shrink-0 text-accent"></i><span>${t}</span></li>`).join('')}</ul>
+            <h4 class="mt-7 text-sm font-semibold">Skills and tools</h4>
+            <ul class="mt-3 flex flex-wrap gap-2">${p.tools.map(t => `<li class="chip">${t}</li>`).join('')}</ul>
+          </div>
+        </div>`;
+      $('#projects-list').hidden = true;
+      d.hidden = false;
       icons();
-      dialog.showModal();
-      dialog.scrollTop = 0;
+      panelBody.scrollTop = 0;
+      $('#project-back').addEventListener('click', () => {
+        showProjectList();
+        $(`[data-project="${id}"]`).focus();
+      });
+      $('#project-back').focus();
     }
-
-    dialog.addEventListener('click', e => { if (e.target === dialog || e.target.closest('[data-close]')) dialog.close(); });
-    dialog.addEventListener('close', () => lastTrigger && lastTrigger.focus());
 
     /* ================= Skills matrix ================= */
     let activeCat = 'all';
@@ -713,12 +757,12 @@
       $('#skill-filters').innerHTML = CATEGORIES.map(c => {
         const count = c.id === 'all' ? SKILLS.length : SKILLS.filter(s => s.cats.includes(c.id)).length;
         return `<button type="button" data-cat="${c.id}" aria-pressed="${c.id === activeCat}"
-          class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas border-line hover:border-ink/40">
+          class="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-ink/40 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-canvas">
           ${c.label}<span class="text-xs tabular-nums opacity-60">${count}</span></button>`;
       }).join('');
 
       $('#skill-cloud').innerHTML = SKILLS.map(s =>
-        `<li class="skill rounded-full border border-line bg-surface px-4 py-2 text-[15px]" data-cats="${s.cats.join(' ')}">${s.name}</li>`
+        `<li class="skill rounded-full border border-line bg-canvas/40 px-4 py-2 text-[15px]" data-cats="${s.cats.join(' ')}">${s.name}</li>`
       ).join('');
 
       $$('[data-cat]').forEach(b => b.addEventListener('click', () => setCategory(b.dataset.cat)));
@@ -785,7 +829,7 @@
         </div>`;
     }
 
-    /* ================= Chrome: theme, header, nav, copy ================= */
+    /* ================= Chrome: theme, copy ================= */
     const themeBtn = $('#theme-toggle');
     const syncThemeLabel = () => {
       const dark = document.documentElement.classList.contains('dark');
@@ -797,19 +841,6 @@
       try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
       syncThemeLabel();
     });
-
-    const header = $('#site-header');
-    const onScroll = () => header.classList.toggle('border-line', window.scrollY > 8);
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    const navLinks = $$('.nav-link');
-    const spy = new IntersectionObserver(entries => {
-      entries.forEach(en => {
-        if (!en.isIntersecting) return;
-        navLinks.forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + en.target.id));
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    ['about', 'experience', 'projects', 'skills'].forEach(id => spy.observe(document.getElementById(id)));
 
     document.addEventListener('click', async e => {
       const btn = e.target.closest('[data-copy]');
@@ -823,14 +854,17 @@
     });
 
     /* ================= Boot ================= */
+    // Deep links: index.html#experience opens straight to that tab
+    const fromHash = location.hash.slice(1);
     renderTimeline();
     renderBento();
     renderSkills();
     renderPrint();
     syncExpandAll();
     syncThemeLabel();
-    onScroll();
     icons();
+    if (TABS.includes(fromHash)) openPanel(fromHash);
+    else { selectTab('about'); setHash(''); }
   </script>
 </body>
 </html>
