@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aditya Sengupta — Product Manager</title>
   <meta name="description" content="Aditya Shankar Sengupta: product manager and RPA consultant at Flipkart. Internal products, process automation and employee experience at scale." />
-  <meta name="theme-color" content="#ECEFE8" />
+  <meta name="theme-color" content="#E9EEF8" />
 
   <!-- Theme before first paint, so dark-mode visitors never see a white flash -->
   <script>
@@ -63,42 +63,42 @@
   <style>
     /* ---------- Design tokens ---------- */
     :root {
-      --canvas: 236 239 232;      /* base under the colour field */
+      --canvas: 233 238 248;      /* cool base under the colour field */
       --surface: 255 255 255;
       --ink: 17 17 17;            /* #111111 charcoal */
       --muted: 82 84 92;
       --line: 214 217 222;
-      --accent: 77 124 15;        /* #4D7C0F muted sage = M3 primary */
-      --accent-soft: 214 234 186; /* M3 primary container */
+      --accent: 10 92 255;        /* #0A5CFF electric blue = M3 primary */
+      --accent-soft: 218 228 255; /* M3 primary container */
       --on-accent: 255 255 255;
-      --on-accent-soft: 22 44 2;
+      --on-accent-soft: 0 26 92;
 
       /* Liquid glass */
       --glass: rgba(255, 255, 255, .42);
-      --glass-strong: rgba(250, 251, 248, .74);
+      --glass-strong: rgba(248, 250, 255, .74);
       --inset: rgba(255, 255, 255, .55);
       --inset-edge: rgba(255, 255, 255, .85);
       --rim-hi: rgba(255, 255, 255, .95);
       --rim-lo: rgba(255, 255, 255, .25);
       --sheen: rgba(255, 255, 255, .5);
-      --glass-shadow: 0 1px 1px rgba(30, 40, 20, .04), 0 12px 32px -14px rgba(30, 40, 20, .28);
-      --glass-shadow-lift: 0 2px 4px rgba(30, 40, 20, .05), 0 22px 44px -16px rgba(30, 40, 20, .35);
+      --glass-shadow: 0 1px 1px rgba(10, 30, 90, .04), 0 12px 32px -14px rgba(10, 30, 90, .28);
+      --glass-shadow-lift: 0 2px 4px rgba(10, 30, 90, .05), 0 22px 44px -16px rgba(10, 30, 90, .35);
 
       /* Colour field the glass refracts */
-      --blob-1: #B5D88A; --blob-2: #9CCBFF; --blob-3: #D5C2FF; --blob-4: #FFCFAE;
+      --blob-1: #5E8DFF; --blob-2: #6FE0FF; --blob-3: #A193FF; --blob-4: #BFE6FF;
       --ease: cubic-bezier(.2, 0, 0, 1); /* M3 emphasized */
       color-scheme: light;
     }
     .dark {
-      --canvas: 10 11 13;
+      --canvas: 5 7 16;
       --surface: 30 31 34;
       --ink: 240 241 238;
       --muted: 168 170 178;
       --line: 58 60 66;
-      --accent: 168 204 110;
-      --accent-soft: 46 66 22;
-      --on-accent: 18 32 4;
-      --on-accent-soft: 214 234 186;
+      --accent: 110 155 255;
+      --accent-soft: 14 44 120;
+      --on-accent: 0 22 78;
+      --on-accent-soft: 218 228 255;
 
       --glass: rgba(40, 42, 48, .38);
       --glass-strong: rgba(22, 23, 26, .72);
@@ -110,7 +110,7 @@
       --glass-shadow: 0 1px 1px rgba(0, 0, 0, .3), 0 14px 36px -14px rgba(0, 0, 0, .7);
       --glass-shadow-lift: 0 2px 4px rgba(0, 0, 0, .35), 0 24px 48px -16px rgba(0, 0, 0, .8);
 
-      --blob-1: #2F6420; --blob-2: #1F4386; --blob-3: #4B2D84; --blob-4: #7A3F1F;
+      --blob-1: #0B3DFF; --blob-2: #0090E0; --blob-3: #3B1FB8; --blob-4: #0A5E8F;
       color-scheme: dark;
     }
 
@@ -172,7 +172,7 @@
 
     /* Accessibility: honour "reduce transparency" with near-solid surfaces */
     @media (prefers-reduced-transparency: reduce) {
-      :root { --glass: rgba(250, 251, 248, .94); --glass-strong: rgba(250, 251, 248, .98); }
+      :root { --glass: rgba(248, 250, 255, .94); --glass-strong: rgba(248, 250, 255, .98); }
       .dark { --glass: rgba(28, 29, 32, .95); --glass-strong: rgba(22, 23, 26, .98); }
     }
 
@@ -256,7 +256,7 @@
     @media (min-width: 768px) {
       dialog.panel { margin: auto; width: min(1040px, calc(100vw - 3rem)); height: min(88vh, 860px); border-radius: 34px; }
     }
-    dialog::backdrop { background: rgb(10 12 8 / .22); -webkit-backdrop-filter: blur(8px) saturate(140%); backdrop-filter: blur(8px) saturate(140%); }
+    dialog::backdrop { background: rgb(4 10 32 / .22); -webkit-backdrop-filter: blur(8px) saturate(140%); backdrop-filter: blur(8px) saturate(140%); }
     .dark dialog::backdrop { background: rgb(0 0 0 / .45); }
     dialog[open] { animation: pop .45s var(--ease); }
     @keyframes pop { from { opacity: 0; transform: translateY(24px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -1105,7 +1105,7 @@
     const syncThemeLabel = () => {
       const dark = document.documentElement.classList.contains('dark');
       themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
-      $('meta[name="theme-color"]').setAttribute('content', dark ? '#0A0B0D' : '#ECEFE8');
+      $('meta[name="theme-color"]').setAttribute('content', dark ? '#050710' : '#E9EEF8');
     };
     themeBtn.addEventListener('click', () => {
       const dark = document.documentElement.classList.toggle('dark');
