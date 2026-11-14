@@ -168,6 +168,37 @@
       transition: transform .45s var(--ease), box-shadow .45s var(--ease), background-color .3s;
     }
     .inset-card:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px var(--inset-edge), var(--glass-shadow); }
+    /* Profile photo: accent-to-colour-field gradient ring around a face crop */
+    .avatar {
+      display: grid; flex-shrink: 0; border-radius: 999px; padding: 2px;
+      background: conic-gradient(from 210deg, rgb(var(--accent)), var(--blob-2), var(--blob-3), rgb(var(--accent)));
+      box-shadow: 0 4px 14px -6px rgb(var(--accent) / .75);
+      transition: transform .45s var(--ease), box-shadow .45s var(--ease);
+    }
+    button:hover > .avatar { transform: scale(1.06); box-shadow: 0 6px 18px -6px rgb(var(--accent) / .9); }
+    .avatar-photo { overflow: hidden; border-radius: inherit; box-shadow: 0 0 0 1.5px rgb(var(--surface) / .85); }
+    .avatar-photo img { width: 100%; height: 100%; object-fit: cover; transform: scale(3.6); transform-origin: 47% 31%; }
+
+    /* Profile card: photo framed in gradient glass, caption on a frosted pill */
+    .profile-card {
+      position: relative; isolation: isolate; border-radius: 30px; padding: 6px;
+      background: linear-gradient(150deg, rgb(var(--accent) / .95), var(--blob-2) 48%, var(--blob-3));
+      box-shadow: var(--glass-shadow-lift);
+    }
+    .profile-card::before {
+      content: ''; position: absolute; inset: -18px; z-index: -1; border-radius: 44px; pointer-events: none;
+      background: inherit; filter: blur(28px); opacity: .45;
+    }
+    .profile-photo { position: relative; height: 100%; overflow: hidden; border-radius: 24px; }
+    .profile-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 47% 30%; transition: transform 1.2s var(--ease); }
+    .profile-card:hover .profile-photo img { transform: scale(1.04); }
+    .profile-photo::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to top, rgb(var(--accent) / .55), rgb(var(--accent) / .12) 38%, transparent 62%);
+      mix-blend-mode: multiply;
+    }
+    .dark .profile-photo::after { background: linear-gradient(to top, rgb(0 0 0 / .6), transparent 60%); mix-blend-mode: normal; }
+
     .chip { display: inline-block; border-radius: 999px; padding: .25rem .75rem; font-size: 13px; color: rgb(var(--muted)); background: var(--inset); box-shadow: inset 0 0 0 1px var(--inset-edge); white-space: nowrap; }
 
     /* Accessibility: honour "reduce transparency" with near-solid surfaces */
@@ -315,10 +346,10 @@
   <!-- ===================== Header: floating glass capsule ===================== -->
   <header class="sticky top-0 z-40 px-3 pt-3 sm:px-6 lg:px-10">
     <div class="glass mx-auto flex h-14 max-w-[1300px] items-center justify-between gap-3 rounded-full px-2">
-      <a href="./" class="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3" aria-label="Aditya Sengupta, home">
-        <span class="grid h-9 w-9 place-items-center rounded-full bg-ink text-[11px] font-semibold tracking-tight text-canvas">AS</span>
+      <button type="button" data-open="about" class="ripple-host flex items-center gap-2.5 rounded-full py-1 pl-1 pr-1 transition-colors hover:bg-ink/[.06] sm:pr-3" aria-label="Aditya Sengupta, open profile">
+        <span class="avatar h-10 w-10"><span class="avatar-photo"><img src="aditya.jpg" alt="" width="640" height="640" decoding="async" /></span></span>
         <span class="hidden text-sm font-semibold tracking-tight sm:inline">Aditya Sengupta</span>
-      </a>
+      </button>
 
       <nav aria-label="Sections" class="hidden items-center gap-1 text-sm md:flex">
         <button type="button" data-open="about" class="ripple-host rounded-full px-4 py-2 text-ink/75 transition-colors hover:bg-ink/[.07] hover:text-ink">About</button>
@@ -441,8 +472,22 @@
     <div id="panel-body" class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-7 sm:px-8 sm:py-9">
       <!-- About -->
       <section role="tabpanel" id="tp-about" aria-labelledby="tab-about" hidden>
-        <div class="grid gap-10 md:grid-cols-12">
-          <div class="md:col-span-7">
+        <div class="grid gap-8 md:grid-cols-12 lg:gap-10">
+          <figure class="profile-card aspect-[5/4] sm:aspect-[16/10] md:col-span-5 md:row-span-2 md:aspect-auto md:min-h-[420px] lg:col-span-4">
+            <div class="profile-photo">
+              <img src="aditya.jpg" alt="Aditya Sengupta smiling in front of a wall of projected flowers" width="640" height="640" loading="lazy" decoding="async" />
+            </div>
+            <span class="absolute left-4 top-4">
+              <span class="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> Navi Mumbai</span>
+            </span>
+            <figcaption class="absolute inset-x-4 bottom-4">
+              <span class="glass block rounded-[20px] px-4 py-3">
+                <span class="block font-semibold tracking-[-0.02em]">Aditya Sengupta</span>
+                <span class="block text-[13px] leading-snug text-ink/70">Product Manager, Flipkart</span>
+              </span>
+            </figcaption>
+          </figure>
+          <div class="md:col-span-7 lg:col-span-8">
             <p class="text-xl leading-relaxed tracking-[-0.01em] sm:text-[1.4rem]">
               For 4.5 years I've worked where product meets process: first as a business analyst at TCS delivering automation for global clients, and now at Flipkart, owning four internal products used across Flipkart and Myntra.
             </p>
@@ -450,7 +495,7 @@
               I translate complex business needs into products that scale, get cross-functional teams pulling in one direction, and ship in agile cycles. Alongside product work I've led 60+ automation deployments on UiPath and Automation Anywhere, saving thousands of operational hours for teams around the world.
             </p>
           </div>
-          <dl class="divide-y divide-line self-start border-y border-line text-[15px] md:col-span-5">
+          <dl class="divide-y divide-line self-start border-y border-line text-[15px] md:col-span-7 lg:col-span-8">
             <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Now</dt><dd>Leading 4 internal products across Flipkart and Myntra</dd></div>
             <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Learning</dt><dd>Professional Certificate in Product Management, IIM Kozhikode</dd></div>
             <div class="grid grid-cols-[6rem_1fr] gap-4 py-3.5"><dt class="text-muted">Based in</dt><dd>Navi Mumbai, India</dd></div>
